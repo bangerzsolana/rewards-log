@@ -177,19 +177,24 @@
     .status-bar.visible { display: block; }
 
     .resync-btn {
-      padding: 8px 16px;
+      padding: 12px 24px;
       border: var(--border-width) solid var(--black-border);
       border-radius: 50px;
-      background: #fff;
-      color: var(--black-border);
-      font-weight: 600;
-      font-size: 13px;
+      background: var(--black-border);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
-      transition: background 0.15s;
+      box-shadow: 4.5px 3px 0px var(--black-border);
+      transition: transform 0.1s, box-shadow 0.1s;
     }
 
-    .resync-btn:hover { background: #f0f0f0; }
+    .resync-btn:active {
+      transform: translate(3px, 2px);
+      box-shadow: 1.5px 1px 0px var(--black-border);
+    }
+
     .resync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     @media (max-width: 600px) {
@@ -208,12 +213,12 @@
     <div class="wallet-input">
       <input type="text" id="walletInput" placeholder="Enter wallet address..." onkeydown="if(event.key==='Enter')loadWallet()" />
       <button onclick="loadWallet()">Load</button>
+      <button class="resync-btn" id="resyncBtn" onclick="resyncWallet()" style="display:none">Re-sync</button>
     </div>
 
     <div class="status-bar" id="statusBar"></div>
 
     <div id="totalsSection"></div>
-    <div id="resyncSection"></div>
     <div id="tournamentsSection"></div>
   </div>
 
@@ -269,10 +274,7 @@
         status.textContent = `Synced. ${tourData.total || 0} tournaments found.`;
         setTimeout(() => { status.className = 'status-bar'; }, 3000);
 
-        // Show resync button
-        document.getElementById('resyncSection').innerHTML = `
-          <button class="resync-btn" id="resyncBtn" onclick="resyncWallet()">Re-sync from chain</button>
-        `;
+        document.getElementById('resyncBtn').style.display = '';
 
       } catch (err) {
         document.getElementById('totalsSection').innerHTML = `<div class="error-msg">${err.message}</div>`;
