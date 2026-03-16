@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewards Log — Gib Meme</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --body-bg: #fff8ec;
+      --pond-bg: #93fff1;
+      --black-border: #101010;
+      --radius: 22px;
+      --border-width: 2px;
+      --success: #01b22e;
+      --error: #F23D4F;
+      --purple: #b29bf4;
+      --pink: #FE8CFA;
+      --blue: #3483FA;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--pond-bg);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--black-border);
+    }
+
+    .wallet-input {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .wallet-input input {
+      flex: 1;
+      padding: 12px 16px;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      background: #fff;
+    }
+
+    .wallet-input input:focus {
+      border-color: var(--purple);
+    }
+
+    .wallet-input button {
+      padding: 12px 24px;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: 50px;
+      background: var(--black-border);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 4.5px 3px 0px var(--black-border);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .wallet-input button:active {
+      transform: translate(3px, 2px);
+      box-shadow: 1.5px 1px 0px var(--black-border);
+    }
+
+    .totals-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .total-card {
+      padding: 16px 24px;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: var(--radius);
+      background: #fff;
+      font-weight: 700;
+      font-size: 20px;
+      white-space: nowrap;
+    }
+
+    .tournaments-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--black-border);
+    }
+
+    .tournament-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: var(--radius);
+      background: #fff;
+      margin-bottom: 8px;
+    }
+
+    .tournament-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .tournament-prizes {
+      display: flex;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .prize-pill {
+      background: #f0f0f0;
+      padding: 4px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 16px;
+      color: #666;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+      font-size: 15px;
+    }
+
+    .error-msg {
+      text-align: center;
+      padding: 20px;
+      color: var(--error);
+      font-weight: 600;
+    }
+
+    .status-bar {
+      margin-bottom: 16px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.05);
+      font-size: 13px;
+      color: #555;
+      display: none;
+    }
+
+    .status-bar.visible { display: block; }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      .total-card { font-size: 16px; padding: 12px 16px; }
+      .tournament-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Rewards Log</h1>
+    </div>
+
+    <div class="wallet-input">
+      <input type="text" id="walletInput" placeholder="Enter wallet address..." />
+      <button onclick="loadWallet()">Load</button>
+    </div>
+
+    <div class="status-bar" id="statusBar"></div>
+
+    <div id="totalsSection"></div>
+    <div id="tournamentsSection"></div>
+  </div>
+
+  <script>
+    const API = window.location.origin;
+
+    // Check URL params for wallet
+    const params = new URLSearchParams(window.location.search);
+    const urlWallet = params.get('wallet');
+    if (urlWallet) {
+      document.getElementById('walletInput').value = urlWallet;
+      loadWallet();
+    }
+
+    async function loadWallet() {
+      const wallet = document.getElementById('walletInput').value.trim();
+      if (!wallet) return;
+
+      // Update URL
+      history.replaceState(null, '', `?wallet=${wallet}`);
+
+      const status = document.getElementById('statusBar');
+      status.className = 'status-bar visible';
+      status.textContent = 'Loading rewards from Solana...';
+
+      document.getElementById('totalsSection').innerHTML = '<div class="loading">Fetching totals...</div>';
+      document.getElementById('tournamentsSection').innerHTML = '';
+
+      try {
+        // Load totals
+        const totalsRes = await fetch(`${API}/api/rewards/totals/${wallet}`);
+        const totalsData = await totalsRes.json();
+
+        if (totalsData.error) {
+          document.getElementById('totalsSection').innerHTML = `<div class="error-msg">${totalsData.error}</div>`;
+          status.className = 'status-bar';
+          return;
+        }
+
+        renderTotals(totalsData.totals);
+
+        // Load tournaments
+        status.textContent = 'Loading tournament details...';
+        const tourRes = await fetch(`${API}/api/rewards/tournaments/${wallet}`);
+        const tourData = await tourRes.json();
+
+        if (tourData.error) {
+          document.getElementById('tournamentsSection').innerHTML = `<div class="error-msg">${tourData.error}</div>`;
+        } else {
+          renderTournaments(tourData.tournaments, tourData.total);
+        }
+
+        status.textContent = `Synced. ${tourData.total || 0} tournaments found.`;
+        setTimeout(() => { status.className = 'status-bar'; }, 3000);
+
+      } catch (err) {
+        document.getElementById('totalsSection').innerHTML = `<div class="error-msg">${err.message}</div>`;
+        status.className = 'status-bar';
+      }
+    }
+
+    function renderTotals(totals) {
+      if (!totals || !totals.length) {
+        document.getElementById('totalsSection').innerHTML = '<div class="empty">No rewards found for this wallet.</div>';
+        return;
+      }
+
+      const html = `
+        <div class="totals-grid">
+          ${totals.map(t => `
+            <div class="total-card">
+              ${formatNumber(t.amount_parsed)} ${t.token_symbol || 'SOL'}
+            </div>
+          `).join('')}
+        </div>
+      `;
+      document.getElementById('totalsSection').innerHTML = html;
+    }
+
+    function renderTournaments(tournaments, total) {
+      if (!tournaments || !tournaments.length) {
+        document.getElementById('tournamentsSection').innerHTML = '<div class="empty">No tournament history.</div>';
+        return;
+      }
+
+      const html = `
+        <div class="tournaments-section">
+          <h2>Tournaments (${total})</h2>
+          ${tournaments.map(t => `
+            <div class="tournament-row">
+              <div class="tournament-name">${t.tournament_name || 'Tournament #' + (t.tournament_index || '?')}</div>
+              <div class="tournament-prizes">
+                ${(t.computed_prizes || []).map(p => `
+                  <span class="prize-pill">${formatNumber(p.parsed)} ${p.symbol}</span>
+                `).join('') || '<span style="color:#999">—</span>'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      document.getElementById('tournamentsSection').innerHTML = html;
+    }
+
+    function formatNumber(n) {
+      n = Number(n);
+      if (isNaN(n)) return '0';
+      if (n < 0.001 && n > 0) return n.toFixed(6);
+      return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+    }
+  </script>
+</body>
+</html>

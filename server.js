@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
@@ -7,6 +8,7 @@ const { getBoardInfo, fetchWalletRewards } = require("./solana");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -15,8 +17,6 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 async function autoMigrate() {
   const client = await pool.connect();
   try {
-    // Drop all old tables to ensure clean schema
-    await client.query(`DROP TABLE IF EXISTS reward_totals, tournament_rewards, wallet_sync`);
     await client.query(`
       CREATE TABLE IF NOT EXISTS reward_totals (
         id SERIAL PRIMARY KEY,
@@ -184,7 +184,7 @@ async function syncWallet(wallet) {
 
 // ── API Routes ──────────────────────────────────────────────────────
 
-app.get("/", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "rewards-log" });
 });
 
