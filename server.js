@@ -56,6 +56,10 @@ async function autoMigrate() {
     `);
     await client.query("CREATE INDEX IF NOT EXISTS idx_reward_totals_wallet ON reward_totals(wallet)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_tournament_rewards_wallet ON tournament_rewards(wallet)");
+    // One-time: clear stale data from before token mapping was added
+    await client.query("DELETE FROM reward_totals");
+    await client.query("DELETE FROM tournament_rewards");
+    await client.query("DELETE FROM wallet_sync");
     console.log("Auto-migration complete.");
   } catch (err) {
     console.error("Auto-migration failed:", err.message);
@@ -133,10 +137,10 @@ async function syncWallet(wallet) {
       console.error(`Prize calc error for tournament ${t.index}:`, e.message);
     }
 
-    // Accumulate totals
+    // Accumulate totals by token symbol
     for (const cp of computedPrizes) {
       const key = cp.symbol || "SOL";
-      if (!totals[key]) totals[key] = { amount: 0, symbol: key, decimals: cp.decimals };
+      if (!totals[key]) totals[key] = { amount: 0, symbol: key, decimals: cp.decimals, halfCurrencyHash: cp.halfCurrencyHash || 0 };
       totals[key].amount += cp.parsed;
     }
 
@@ -159,14 +163,13 @@ async function syncWallet(wallet) {
     );
   }
 
-  // Update totals table
+  // Clear old totals and write fresh
+  await pool.query("DELETE FROM reward_totals WHERE wallet = $1", [wallet]);
   for (const [symbol, data] of Object.entries(totals)) {
     await pool.query(
       `INSERT INTO reward_totals (wallet, half_currency_hash, amount, amount_parsed, token_symbol, token_decimals, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW())
-       ON CONFLICT (wallet, half_currency_hash)
-       DO UPDATE SET amount = reward_totals.amount + $3, amount_parsed = reward_totals.amount_parsed + $4, token_symbol = $5, updated_at = NOW()`,
-      [wallet, 0, data.amount, data.amount, symbol, data.decimals]
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+      [wallet, data.halfCurrencyHash, data.amount, data.amount, symbol, data.decimals]
     );
   }
 

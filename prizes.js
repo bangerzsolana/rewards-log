@@ -1,5 +1,19 @@
 // Prize calculation logic ported from GlobalGibMeme (gibmeme.js)
 
+// Token map from front-end (halfCurrencyHash → token info)
+const TOKEN_MAP = {
+  0:          { mint: null, symbol: "SOL", decimals: 9 },
+  1025640761: { mint: "2MwjFE1zbXyNKw6VjzGWa3BhPtFcs8htuX2xwRAtbonk", symbol: "CHONKY", decimals: 5 },
+  3060408161: { mint: "SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3", symbol: "SKR", decimals: 6 },
+  641443857:  { mint: "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", symbol: "WIF", decimals: 6 },
+  173147864:  { mint: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", symbol: "BONK", decimals: 5 },
+  836488067:  { mint: "H7ed7UgcLp3ax4X1CQ5WuWDn6d1pprfMMYiv5ejwLWWU", symbol: "CHONKY", decimals: 5 },
+  2146078117: { mint: "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr", symbol: "POPCAT", decimals: 9 },
+  1880961862: { mint: "SENDdRQtYMWaQrBroBrJ2Q53fgVuq95CV9UPGEvpCxa", symbol: "SEND", decimals: 6 },
+  2161872254: { mint: "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m", symbol: "MPLX", decimals: 6 },
+  646306111:  { mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", symbol: "USDC", decimals: 6 },
+};
+
 const roundsCache = {};
 
 function calculateRoundsAndRemainings(amountOfPlayers) {
@@ -177,11 +191,12 @@ function computeUserPrizes(tournament) {
   });
 
   return moneys.map((amount, i) => {
-    const token = prizes[i].token;
-    const decimals = token?.decimals ?? 9;
-    const symbol = token?.symbol?.replace(/\0/g, "") ?? "SOL";
+    const hash = prizes[i].halfCurrencyHash;
+    const token = TOKEN_MAP[hash] || TOKEN_MAP[0];
+    const decimals = token.decimals;
+    const symbol = token.symbol;
     const parsed = amount / 10 ** decimals;
-    return { amount, parsed, symbol, decimals };
+    return { amount, parsed, symbol, decimals, halfCurrencyHash: hash };
   });
 }
 
