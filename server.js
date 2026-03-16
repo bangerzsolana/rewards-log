@@ -45,6 +45,8 @@ async function autoMigrate() {
         UNIQUE(wallet, tournament)
       )
     `);
+    // Drop old wallet_sync if schema changed
+    await client.query(`DROP TABLE IF EXISTS wallet_sync`);
     await client.query(`
       CREATE TABLE IF NOT EXISTS wallet_sync (
         wallet TEXT PRIMARY KEY,
