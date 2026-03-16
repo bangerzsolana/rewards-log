@@ -176,6 +176,22 @@
 
     .status-bar.visible { display: block; }
 
+    .resync-btn {
+      padding: 8px 16px;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: 50px;
+      background: #fff;
+      color: var(--black-border);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s;
+    }
+
+    .resync-btn:hover { background: #f0f0f0; }
+    .resync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
     @media (max-width: 600px) {
       body { padding: 16px; }
       .total-card { font-size: 16px; padding: 12px 16px; }
@@ -190,13 +206,14 @@
     </div>
 
     <div class="wallet-input">
-      <input type="text" id="walletInput" placeholder="Enter wallet address..." />
+      <input type="text" id="walletInput" placeholder="Enter wallet address..." onkeydown="if(event.key==='Enter')loadWallet()" />
       <button onclick="loadWallet()">Load</button>
     </div>
 
     <div class="status-bar" id="statusBar"></div>
 
     <div id="totalsSection"></div>
+    <div id="resyncSection"></div>
     <div id="tournamentsSection"></div>
   </div>
 
@@ -252,6 +269,11 @@
         status.textContent = `Synced. ${tourData.total || 0} tournaments found.`;
         setTimeout(() => { status.className = 'status-bar'; }, 3000);
 
+        // Show resync button
+        document.getElementById('resyncSection').innerHTML = `
+          <button class="resync-btn" id="resyncBtn" onclick="resyncWallet()">Re-sync from chain</button>
+        `;
+
       } catch (err) {
         document.getElementById('totalsSection').innerHTML = `<div class="error-msg">${err.message}</div>`;
         status.className = 'status-bar';
@@ -298,6 +320,28 @@
         </div>
       `;
       document.getElementById('tournamentsSection').innerHTML = html;
+    }
+
+    async function resyncWallet() {
+      const wallet = document.getElementById('walletInput').value.trim();
+      if (!wallet) return;
+
+      const btn = document.getElementById('resyncBtn');
+      btn.disabled = true;
+      btn.textContent = 'Re-syncing...';
+
+      const status = document.getElementById('statusBar');
+      status.className = 'status-bar visible';
+      status.textContent = 'Force re-syncing from Solana...';
+
+      try {
+        await fetch(`${API}/api/rewards/sync/${wallet}`, { method: 'POST' });
+        btn.textContent = 'Done!';
+        await loadWallet();
+      } catch (err) {
+        btn.textContent = 'Re-sync failed';
+        status.textContent = err.message;
+      }
     }
 
     function formatNumber(n) {
