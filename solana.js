@@ -24,7 +24,7 @@ function bytesTo16(bytes) {
 }
 
 function bytesTo32(bytes) {
-  return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+  return (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)) >>> 0;
 }
 
 function bytesTo64(bytes) {
