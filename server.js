@@ -15,6 +15,8 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 async function autoMigrate() {
   const client = await pool.connect();
   try {
+    // Drop all old tables to ensure clean schema
+    await client.query(`DROP TABLE IF EXISTS reward_totals, tournament_rewards, wallet_sync`);
     await client.query(`
       CREATE TABLE IF NOT EXISTS reward_totals (
         id SERIAL PRIMARY KEY,
@@ -45,8 +47,6 @@ async function autoMigrate() {
         UNIQUE(wallet, tournament)
       )
     `);
-    // Drop old wallet_sync if schema changed
-    await client.query(`DROP TABLE IF EXISTS wallet_sync`);
     await client.query(`
       CREATE TABLE IF NOT EXISTS wallet_sync (
         wallet TEXT PRIMARY KEY,
