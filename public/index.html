@@ -167,6 +167,55 @@
       color: #fff;
     }
 
+    /* ── Totals strip ────────────────────── */
+
+    .totals-strip {
+      display: flex;
+      gap: 12px;
+      padding: 0 24px 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .totals-strip::-webkit-scrollbar { display: none; }
+
+    .total-box {
+      flex: 0 0 auto;
+      min-width: 140px;
+      background: #f4f4f4;
+      border-radius: var(--half-radius);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .total-box:first-child {
+      background: linear-gradient(135deg, #f0e6ff 0%, #e6f0ff 100%);
+    }
+
+    .total-box .total-value {
+      font-family: 'LuckiestGuy', sans-serif;
+      font-size: 28px;
+      color: var(--black-border);
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+
+    .total-box:first-child .total-value {
+      color: #9945FF;
+    }
+
+    .total-box .total-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
     /* ── Card grid ────────────────────────── */
 
     .card-grid {
@@ -257,6 +306,9 @@
     }
 
     @media (max-width: 700px) {
+      .totals-strip { padding: 0 16px 16px; gap: 10px; }
+      .total-box { min-width: 120px; padding: 12px 16px; }
+      .total-box .total-value { font-size: 22px; }
       .card-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px 20px; }
       .reward-card .stage-img { width: 90px; height: 90px; }
       .reward-card .tournament-name { font-size: 14px; }
@@ -292,6 +344,7 @@
       </div>
 
       <div id="rewardsTab">
+        <div id="totalsStrip" class="totals-strip" style="display:none"></div>
         <div id="cardGrid"></div>
       </div>
 
@@ -349,8 +402,12 @@
       document.getElementById('cardGrid').innerHTML = '<div class="loading">Fetching tournaments...</div>';
 
       try {
-        const res = await fetch(`${API}/api/rewards/tournaments/${wallet}?limit=100`);
-        const data = await res.json();
+        const [tournamentsRes, totalsRes] = await Promise.all([
+          fetch(`${API}/api/rewards/tournaments/${wallet}?limit=100`),
+          fetch(`${API}/api/rewards/totals/${wallet}`),
+        ]);
+        const data = await tournamentsRes.json();
+        const totalsData = await totalsRes.json();
 
         if (data.error) {
           document.getElementById('cardGrid').innerHTML = `<div class="error-msg">${data.error}</div>`;
@@ -358,6 +415,7 @@
           return;
         }
 
+        renderTotals(totalsData.totals || []);
         renderCards(data.tournaments);
 
         status.textContent = `${data.total} tournaments loaded.`;
@@ -393,6 +451,35 @@
         btn.disabled = false;
         status.textContent = err.message;
       }
+    }
+
+    // ── Render totals strip ─────────────────────
+    function renderTotals(totals) {
+      const strip = document.getElementById('totalsStrip');
+
+      // Filter out zero values
+      const nonZero = totals.filter(t => Number(t.amount_parsed) > 0);
+
+      if (!nonZero.length) {
+        strip.style.display = 'none';
+        return;
+      }
+
+      // Sort: SOL first, then alphabetically by symbol
+      nonZero.sort((a, b) => {
+        if (a.token_symbol === 'SOL') return -1;
+        if (b.token_symbol === 'SOL') return 1;
+        return (a.token_symbol || '').localeCompare(b.token_symbol || '');
+      });
+
+      strip.innerHTML = nonZero.map(t => `
+        <div class="total-box">
+          <span class="total-value">${formatNumber(t.amount_parsed)}</span>
+          <span class="total-label">${escHtml(t.token_symbol || 'Unknown')}</span>
+        </div>
+      `).join('');
+
+      strip.style.display = '';
     }
 
     // ── Render cards ───────────────────────────
