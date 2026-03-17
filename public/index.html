@@ -292,7 +292,7 @@
         <div class="totals-grid">
           ${totals.map(t => `
             <div class="total-card">
-              ${formatNumber(t.amount_parsed)} ${t.token_symbol || 'SOL'}
+              ${formatTotal(t.amount_parsed)} ${t.token_symbol || 'SOL'}
             </div>
           `).join('')}
         </div>
@@ -346,10 +346,21 @@
       }
     }
 
+    function formatTotal(n) {
+      n = Number(n);
+      if (isNaN(n)) return '0';
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+      if (n >= 1_000) return (n / 1_000).toFixed(2) + 'K';
+      if (n >= 1) return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      if (n < 0.001 && n > 0) return n.toFixed(4);
+      return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
     function formatNumber(n) {
       n = Number(n);
       if (isNaN(n)) return '0';
-      if (n < 0.001 && n > 0) return n.toFixed(6);
+      if (n >= 1_000) return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      if (n < 0.001 && n > 0) return n.toFixed(4);
       return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
     }
   </script>
