@@ -227,14 +227,6 @@
 </head>
 <body>
   <div class="container">
-    <div class="page-header">
-      <h1>Rewards</h1>
-      <div class="tabs">
-        <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
-        <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
-      </div>
-    </div>
-
     <div class="wallet-bar">
       <input type="text" id="walletInput" placeholder="Enter wallet address..." onkeydown="if(event.key==='Enter')loadWallet()" />
       <button class="btn" onclick="loadWallet()">Load</button>
@@ -242,6 +234,14 @@
     </div>
 
     <div class="status-bar" id="statusBar"></div>
+
+    <div class="page-header">
+      <h1>Rewards</h1>
+      <div class="tabs">
+        <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
+        <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
+      </div>
+    </div>
 
     <div id="rewardsTab">
       <div id="cardGrid"></div>
