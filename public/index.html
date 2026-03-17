@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rewards Log — Gib Meme</title>
+  <title>Rewards — Gib Meme</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --body-bg: #fff8ec;
       --pond-bg: #93fff1;
       --black-border: #101010;
       --radius: 22px;
       --border-width: 2px;
-      --success: #01b22e;
-      --error: #F23D4F;
-      --purple: #b29bf4;
-      --pink: #FE8CFA;
-      --blue: #3483FA;
+      --card-green: #e8f8e0;
+      --tab-active: #101010;
+      --tab-inactive: #e0e0e0;
+      --tab-text: #888;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,34 +24,68 @@
       font-family: 'Inter', sans-serif;
       background: var(--pond-bg);
       min-height: 100vh;
-      padding: 24px;
+      padding: 80px 24px 24px;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
-    .header {
+    /* ── Header ─────────────────────────────── */
+
+    .page-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       margin-bottom: 24px;
     }
 
-    .header h1 {
+    .page-header h1 {
       font-size: 28px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--black-border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .wallet-input {
+    /* ── Tabs ────────────────────────────────── */
+
+    .tabs {
+      display: flex;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: 50px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .tab {
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      border: none;
+      background: #fff;
+      color: var(--tab-text);
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--tab-active);
+      color: #fff;
+      border-radius: 50px;
+    }
+
+    /* ── Wallet input ────────────────────────── */
+
+    .wallet-bar {
       display: flex;
       gap: 8px;
       margin-bottom: 24px;
     }
 
-    .wallet-input input {
+    .wallet-bar input {
       flex: 1;
       padding: 12px 16px;
       border: var(--border-width) solid var(--black-border);
@@ -64,11 +96,9 @@
       background: #fff;
     }
 
-    .wallet-input input:focus {
-      border-color: var(--purple);
-    }
+    .wallet-bar input:focus { border-color: #b29bf4; }
 
-    .wallet-input button {
+    .btn {
       padding: 12px 24px;
       border: var(--border-width) solid var(--black-border);
       border-radius: 50px;
@@ -82,87 +112,14 @@
       transition: transform 0.1s, box-shadow 0.1s;
     }
 
-    .wallet-input button:active {
+    .btn:active {
       transform: translate(3px, 2px);
       box-shadow: 1.5px 1px 0px var(--black-border);
     }
 
-    .totals-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .total-card {
-      padding: 16px 24px;
-      border: var(--border-width) solid var(--black-border);
-      border-radius: var(--radius);
-      background: #fff;
-      font-weight: 700;
-      font-size: 20px;
-      white-space: nowrap;
-    }
-
-    .tournaments-section h2 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--black-border);
-    }
-
-    .tournament-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border: var(--border-width) solid var(--black-border);
-      border-radius: var(--radius);
-      background: #fff;
-      margin-bottom: 8px;
-    }
-
-    .tournament-name {
-      font-weight: 600;
-      font-size: 15px;
-    }
-
-    .tournament-prizes {
-      display: flex;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .prize-pill {
-      background: #f0f0f0;
-      padding: 4px 10px;
-      border-radius: 12px;
-      white-space: nowrap;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      font-size: 16px;
-      color: #666;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: #999;
-      font-size: 15px;
-    }
-
-    .error-msg {
-      text-align: center;
-      padding: 20px;
-      color: var(--error);
-      font-weight: 600;
-    }
+    /* ── Status ──────────────────────────────── */
 
     .status-bar {
       margin-bottom: 16px;
@@ -176,56 +133,137 @@
 
     .status-bar.visible { display: block; }
 
-    .resync-btn {
-      padding: 12px 24px;
+    /* ── Card grid ───────────────────────────── */
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .reward-card {
+      background: var(--card-green);
       border: var(--border-width) solid var(--black-border);
-      border-radius: 50px;
-      background: var(--black-border);
-      color: #fff;
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .reward-card .stage-img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+    }
+
+    .reward-card .tournament-name {
+      font-weight: 800;
+      font-size: 15px;
+      text-transform: uppercase;
+      color: var(--black-border);
+      letter-spacing: 0.3px;
+    }
+
+    .reward-card .rounds-label {
+      font-size: 13px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .reward-card .prizes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .prize-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
       font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      box-shadow: 4.5px 3px 0px var(--black-border);
-      transition: transform 0.1s, box-shadow 0.1s;
+      color: var(--black-border);
     }
 
-    .resync-btn:active {
-      transform: translate(3px, 2px);
-      box-shadow: 1.5px 1px 0px var(--black-border);
+    .token-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
     }
 
-    .resync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* ── Battle log placeholder ──────────────── */
 
-    @media (max-width: 600px) {
-      body { padding: 16px; }
-      .total-card { font-size: 16px; padding: 12px 16px; }
-      .tournament-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .battle-log-placeholder {
+      text-align: center;
+      padding: 80px 20px;
+      color: #999;
+      font-size: 15px;
+    }
+
+    /* ── Empty / error / loading ─────────────── */
+
+    .loading { text-align: center; padding: 40px; font-size: 16px; color: #666; }
+    .empty { text-align: center; padding: 60px 20px; color: #999; font-size: 15px; }
+    .error-msg { text-align: center; padding: 20px; color: #F23D4F; font-weight: 600; }
+
+    /* ── Responsive ──────────────────────────── */
+
+    @media (max-width: 800px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+      .reward-card .stage-img { width: 90px; height: 90px; }
+      body { padding: 60px 16px 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>Rewards Log</h1>
+    <div class="page-header">
+      <h1>Rewards</h1>
+      <div class="tabs">
+        <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
+        <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
+      </div>
     </div>
 
-    <div class="wallet-input">
+    <div class="wallet-bar">
       <input type="text" id="walletInput" placeholder="Enter wallet address..." onkeydown="if(event.key==='Enter')loadWallet()" />
-      <button onclick="loadWallet()">Load</button>
-      <button class="resync-btn" id="resyncBtn" onclick="resyncWallet()" style="display:none">Re-sync</button>
+      <button class="btn" onclick="loadWallet()">Load</button>
+      <button class="btn" id="resyncBtn" onclick="resyncWallet()" style="display:none">Re-sync</button>
     </div>
 
     <div class="status-bar" id="statusBar"></div>
 
-    <div id="totalsSection"></div>
-    <div id="tournamentsSection"></div>
+    <div id="rewardsTab">
+      <div id="cardGrid"></div>
+    </div>
+
+    <div id="battleTab" style="display:none">
+      <div class="battle-log-placeholder">Nothing here yet.</div>
+    </div>
   </div>
 
   <script>
     const API = window.location.origin;
 
-    // Check URL params for wallet
+    // ── Tab switching ──────────────────────────
+    function switchTab(tab) {
+      document.getElementById('tabRewards').className = tab === 'rewards' ? 'tab active' : 'tab';
+      document.getElementById('tabBattle').className = tab === 'battle' ? 'tab active' : 'tab';
+      document.getElementById('rewardsTab').style.display = tab === 'rewards' ? '' : 'none';
+      document.getElementById('battleTab').style.display = tab === 'battle' ? '' : 'none';
+    }
+
+    // ── URL params ─────────────────────────────
     const params = new URLSearchParams(window.location.search);
     const urlWallet = params.get('wallet');
     if (urlWallet) {
@@ -233,97 +271,57 @@
       loadWallet();
     }
 
+    // ── Stage logic ────────────────────────────
+    function getStage(lastRound, totalRounds) {
+      if (lastRound <= 1) return 0;
+      const remaining = totalRounds - 1;
+      const lower = 1 + Math.floor(remaining * 0.4);
+      const upper = 1 + Math.floor(remaining * 0.8);
+      if (lastRound <= lower) return 1;
+      if (lastRound <= upper) return 2;
+      return 3;
+    }
+
+    function stageImage(stage) {
+      return `/assets/stage${stage}.png`;
+    }
+
+    // ── Load wallet ────────────────────────────
     async function loadWallet() {
       const wallet = document.getElementById('walletInput').value.trim();
       if (!wallet) return;
 
-      // Update URL
       history.replaceState(null, '', `?wallet=${wallet}`);
 
       const status = document.getElementById('statusBar');
       status.className = 'status-bar visible';
       status.textContent = 'Loading rewards from Solana...';
 
-      document.getElementById('totalsSection').innerHTML = '<div class="loading">Fetching totals...</div>';
-      document.getElementById('tournamentsSection').innerHTML = '';
+      document.getElementById('cardGrid').innerHTML = '<div class="loading">Fetching tournaments...</div>';
 
       try {
-        // Load totals
-        const totalsRes = await fetch(`${API}/api/rewards/totals/${wallet}`);
-        const totalsData = await totalsRes.json();
+        const res = await fetch(`${API}/api/rewards/tournaments/${wallet}?limit=100`);
+        const data = await res.json();
 
-        if (totalsData.error) {
-          document.getElementById('totalsSection').innerHTML = `<div class="error-msg">${totalsData.error}</div>`;
+        if (data.error) {
+          document.getElementById('cardGrid').innerHTML = `<div class="error-msg">${data.error}</div>`;
           status.className = 'status-bar';
           return;
         }
 
-        renderTotals(totalsData.totals);
+        renderCards(data.tournaments);
 
-        // Load tournaments
-        status.textContent = 'Loading tournament details...';
-        const tourRes = await fetch(`${API}/api/rewards/tournaments/${wallet}`);
-        const tourData = await tourRes.json();
-
-        if (tourData.error) {
-          document.getElementById('tournamentsSection').innerHTML = `<div class="error-msg">${tourData.error}</div>`;
-        } else {
-          renderTournaments(tourData.tournaments, tourData.total);
-        }
-
-        status.textContent = `Synced. ${tourData.total || 0} tournaments found.`;
+        status.textContent = `${data.total} tournaments loaded.`;
         setTimeout(() => { status.className = 'status-bar'; }, 3000);
-
         document.getElementById('resyncBtn').style.display = '';
 
       } catch (err) {
-        document.getElementById('totalsSection').innerHTML = `<div class="error-msg">${err.message}</div>`;
+        document.getElementById('cardGrid').innerHTML = `<div class="error-msg">${err.message}</div>`;
         status.className = 'status-bar';
       }
     }
 
-    function renderTotals(totals) {
-      if (!totals || !totals.length) {
-        document.getElementById('totalsSection').innerHTML = '<div class="empty">No rewards found for this wallet.</div>';
-        return;
-      }
-
-      const html = `
-        <div class="totals-grid">
-          ${totals.map(t => `
-            <div class="total-card">
-              ${formatTotal(t.amount_parsed)} ${t.token_symbol || 'SOL'}
-            </div>
-          `).join('')}
-        </div>
-      `;
-      document.getElementById('totalsSection').innerHTML = html;
-    }
-
-    function renderTournaments(tournaments, total) {
-      if (!tournaments || !tournaments.length) {
-        document.getElementById('tournamentsSection').innerHTML = '<div class="empty">No tournament history.</div>';
-        return;
-      }
-
-      const html = `
-        <div class="tournaments-section">
-          <h2>Tournaments (${total})</h2>
-          ${tournaments.map(t => `
-            <div class="tournament-row">
-              <div class="tournament-name">${t.tournament_name || 'Tournament #' + (t.tournament_index || '?')}</div>
-              <div class="tournament-prizes">
-                ${(t.computed_prizes || []).map(p => `
-                  <span class="prize-pill">${formatNumber(p.parsed)} ${p.symbol}</span>
-                `).join('') || '<span style="color:#999">—</span>'}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-      document.getElementById('tournamentsSection').innerHTML = html;
-    }
-
+    // ── Re-sync ────────────────────────────────
     async function resyncWallet() {
       const wallet = document.getElementById('walletInput').value.trim();
       if (!wallet) return;
@@ -338,30 +336,65 @@
 
       try {
         await fetch(`${API}/api/rewards/sync/${wallet}`, { method: 'POST' });
-        btn.textContent = 'Done!';
+        btn.textContent = 'Re-sync';
+        btn.disabled = false;
         await loadWallet();
       } catch (err) {
-        btn.textContent = 'Re-sync failed';
+        btn.textContent = 'Re-sync';
+        btn.disabled = false;
         status.textContent = err.message;
       }
     }
 
-    function formatTotal(n) {
-      n = Number(n);
-      if (isNaN(n)) return '0';
-      if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
-      if (n >= 1_000) return (n / 1_000).toFixed(2) + 'K';
-      if (n >= 1) return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-      if (n < 0.001 && n > 0) return n.toFixed(4);
-      return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    // ── Render cards ───────────────────────────
+    function renderCards(tournaments) {
+      if (!tournaments || !tournaments.length) {
+        document.getElementById('cardGrid').innerHTML = '<div class="empty">No tournament rewards found.</div>';
+        return;
+      }
+
+      const html = `<div class="card-grid">
+        ${tournaments.map(t => {
+          const lastRound = t.last_round || 0;
+          const totalRounds = t.total_rounds || 1;
+          const stage = getStage(lastRound, totalRounds);
+          const name = t.tournament_name || 'Tournament #' + (t.tournament_index || '?');
+          const prizes = t.computed_prizes || [];
+
+          return `
+            <div class="reward-card">
+              <img class="stage-img" src="${stageImage(stage)}" alt="Stage ${stage}" />
+              <div class="tournament-name">${escHtml(name)}</div>
+              <div class="rounds-label">You won ${lastRound} round${lastRound !== 1 ? 's' : ''}</div>
+              <div class="prizes-list">
+                ${prizes.map(p => `
+                  <div class="prize-line">
+                    <span class="token-dot"></span>
+                    +${formatNumber(p.parsed)} ${p.symbol}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>`;
+
+      document.getElementById('cardGrid').innerHTML = html;
     }
 
+    // ── Helpers ─────────────────────────────────
     function formatNumber(n) {
       n = Number(n);
       if (isNaN(n)) return '0';
-      if (n >= 1_000) return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
       if (n < 0.001 && n > 0) return n.toFixed(4);
-      return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+      return n.toLocaleString('en-US', { maximumFractionDigits: 4 });
+    }
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
     }
   </script>
 </body>
