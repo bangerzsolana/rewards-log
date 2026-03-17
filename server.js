@@ -17,6 +17,8 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 async function autoMigrate() {
   const client = await pool.connect();
   try {
+    // Drop all tables to ensure schema is up to date
+    await client.query("DROP TABLE IF EXISTS reward_totals, tournament_rewards, wallet_sync");
     await client.query(`
       CREATE TABLE IF NOT EXISTS reward_totals (
         id SERIAL PRIMARY KEY,
@@ -58,10 +60,6 @@ async function autoMigrate() {
     `);
     await client.query("CREATE INDEX IF NOT EXISTS idx_reward_totals_wallet ON reward_totals(wallet)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_tournament_rewards_wallet ON tournament_rewards(wallet)");
-    // Clear stale data — positions were calculated wrong (bug fix)
-    await client.query("DELETE FROM reward_totals");
-    await client.query("DELETE FROM tournament_rewards");
-    await client.query("DELETE FROM wallet_sync");
     console.log("Auto-migration complete.");
   } catch (err) {
     console.error("Auto-migration failed:", err.message);
