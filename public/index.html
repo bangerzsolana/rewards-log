@@ -182,22 +182,36 @@
 
     .total-box {
       flex: 0 0 auto;
-      min-width: 140px;
+      min-width: 180px;
       background: #f4f4f4;
       border-radius: var(--half-radius);
-      padding: 16px 20px;
+      padding: 12px 16px 12px 12px;
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      gap: 12px;
     }
 
     .total-box:first-child {
       background: linear-gradient(135deg, #f0e6ff 0%, #e6f0ff 100%);
     }
 
+    .total-coin {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .total-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
     .total-box .total-value {
       font-family: 'LuckiestGuy', sans-serif;
-      font-size: 28px;
+      font-size: 24px;
       color: var(--black-border);
       line-height: 1.15;
       white-space: nowrap;
@@ -221,7 +235,7 @@
       font-size: 10px;
       font-weight: 500;
       color: #aaa;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     /* ── Card grid ────────────────────────── */
@@ -315,8 +329,9 @@
 
     @media (max-width: 700px) {
       .totals-strip { padding: 0 16px 16px; gap: 10px; }
-      .total-box { min-width: 120px; padding: 12px 16px; }
-      .total-box .total-value { font-size: 22px; }
+      .total-box { min-width: 150px; padding: 10px 12px 10px 10px; }
+      .total-coin { width: 44px; height: 44px; }
+      .total-box .total-value { font-size: 20px; }
       .card-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px 20px; }
       .reward-card .stage-img { width: 90px; height: 90px; }
       .reward-card .tournament-name { font-size: 14px; }
@@ -462,6 +477,19 @@
     }
 
     // ── Render totals strip ─────────────────────
+    const COIN_IMAGES = {
+      SOL: '/assets/coins/SOL.png',
+      BONK: '/assets/coins/BONK.png',
+      SEND: '/assets/coins/SEND.png',
+      POPCAT: '/assets/coins/POPCAT.png',
+      MPLX: '/assets/coins/MPLX.png',
+      CHONKY: '/assets/coins/CHONKY.png',
+    };
+
+    function getCoinImage(symbol) {
+      return COIN_IMAGES[symbol] || '/assets/coins/placeholder.png';
+    }
+
     function renderTotals(totals) {
       const strip = document.getElementById('totalsStrip');
 
@@ -482,9 +510,12 @@
 
       strip.innerHTML = nonZero.map(t => `
         <div class="total-box">
-          <span class="total-value">${formatNumber(t.amount_parsed)}</span>
-          <span class="total-label">${escHtml(t.token_symbol || 'Unknown')}</span>
-          <span class="total-sublabel">Total Rewards</span>
+          <img class="total-coin" src="${getCoinImage(t.token_symbol)}" alt="${escHtml(t.token_symbol)}" />
+          <div class="total-text">
+            <span class="total-value">${formatNumber(t.amount_parsed)}</span>
+            <span class="total-label">${escHtml(t.token_symbol || 'Unknown')}</span>
+            <span class="total-sublabel">Total Rewards</span>
+          </div>
         </div>
       `).join('');
 
