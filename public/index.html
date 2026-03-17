@@ -230,12 +230,16 @@
       letter-spacing: 0.8px;
     }
 
-    .total-box .total-sublabel {
+    /* ── Section headers ──────────────────── */
+
+    .section-title {
       font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-weight: 500;
-      color: #aaa;
-      margin-top: 1px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0 24px 10px;
     }
 
     /* ── Card grid ────────────────────────── */
@@ -328,6 +332,7 @@
     }
 
     @media (max-width: 700px) {
+      .section-title { padding: 0 16px 8px; }
       .totals-strip { padding: 0 16px 16px; gap: 10px; }
       .total-box { min-width: 150px; padding: 10px 12px 10px 10px; }
       .total-coin { width: 44px; height: 44px; }
@@ -359,15 +364,21 @@
 
     <div class="rewards-panel">
       <div class="page-header">
-        <span class="page-title">REWARDS</span>
+        <span class="page-title">REWARDS LOG</span>
         <div class="tabs">
-          <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
+          <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards Log</button>
           <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
         </div>
       </div>
 
       <div id="rewardsTab">
-        <div id="totalsStrip" class="totals-strip" style="display:none"></div>
+        <div id="totalRewardsSection" style="display:none">
+          <div class="section-title">Total Rewards</div>
+          <div id="totalsStrip" class="totals-strip"></div>
+        </div>
+        <div id="tournamentRewardsSection" style="display:none">
+          <div class="section-title">Tournament Rewards</div>
+        </div>
         <div id="cardGrid"></div>
       </div>
 
@@ -492,12 +503,13 @@
 
     function renderTotals(totals) {
       const strip = document.getElementById('totalsStrip');
+      const section = document.getElementById('totalRewardsSection');
 
       // Filter out zero values
       const nonZero = totals.filter(t => Number(t.amount_parsed) > 0);
 
       if (!nonZero.length) {
-        strip.style.display = 'none';
+        section.style.display = 'none';
         return;
       }
 
@@ -514,20 +526,22 @@
           <div class="total-text">
             <span class="total-value">${formatNumber(t.amount_parsed)}</span>
             <span class="total-label">${escHtml(t.token_symbol || 'Unknown')}</span>
-            <span class="total-sublabel">Total Rewards</span>
           </div>
         </div>
       `).join('');
 
-      strip.style.display = '';
+      section.style.display = '';
     }
 
     // ── Render cards ───────────────────────────
     function renderCards(tournaments) {
+      const tournSection = document.getElementById('tournamentRewardsSection');
       if (!tournaments || !tournaments.length) {
         document.getElementById('cardGrid').innerHTML = '<div class="empty">No tournament rewards found.</div>';
+        tournSection.style.display = 'none';
         return;
       }
+      tournSection.style.display = '';
 
       const html = `<div class="card-grid">
         ${tournaments.map(t => {
