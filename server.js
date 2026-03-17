@@ -56,7 +56,7 @@ async function autoMigrate() {
     `);
     await client.query("CREATE INDEX IF NOT EXISTS idx_reward_totals_wallet ON reward_totals(wallet)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_tournament_rewards_wallet ON tournament_rewards(wallet)");
-    // One-time: clear stale data from before token mapping was added
+    // Clear stale data — positions were calculated wrong (bug fix)
     await client.query("DELETE FROM reward_totals");
     await client.query("DELETE FROM tournament_rewards");
     await client.query("DELETE FROM wallet_sync");
@@ -275,6 +275,41 @@ app.get("/api/debug/board", async (req, res) => {
   try {
     const info = await getBoardInfo();
     res.json(info);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Debug: raw tournament data for a specific index
+app.get("/api/debug/tournament/:index", async (req, res) => {
+  try {
+    const { fetchTournament } = require("./solana");
+    const t = await fetchTournament(parseInt(req.params.index));
+    if (!t) return res.status(404).json({ error: "tournament not found" });
+    res.json(t);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Debug: raw tournament data + wallet positions
+app.get("/api/debug/tournament/:index/:wallet", async (req, res) => {
+  try {
+    const { fetchTournament, getUserPositions } = require("./solana");
+    const { computeUserPrizes } = require("./prizes");
+    const t = await fetchTournament(parseInt(req.params.index));
+    if (!t) return res.status(404).json({ error: "tournament not found" });
+    const positions = getUserPositions(t.parts, req.params.wallet);
+    const posArray = Object.entries(positions).map(([round, amount]) => ({ round, amount }));
+    const computed = computeUserPrizes({
+      positions: posArray,
+      prizes: t.prizes,
+      players: t.registeredPlayers,
+      id: t.index,
+    });
+    // Include matching parts for this wallet
+    const userParts = t.parts.filter(p => p.user === req.params.wallet);
+    res.json({ ...t, parts: userParts, myPositions: positions, computedPrizes: computed });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

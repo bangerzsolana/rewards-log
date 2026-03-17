@@ -169,18 +169,18 @@ function decodePrizes(raw) {
 }
 
 // ── Get user positions from tournament parts ────────────────────────
-// myPositions maps round number → count of how many times user won that round
+// myPositions maps round number → count of entries at that position
+// Each entry contributes ONE position at their lastRound
 
 function getUserPositions(parts, wallet) {
   const positions = {};
   for (const part of parts) {
     if (part.user !== wallet) continue;
     // active states: 1=alive, 2=dead, 11=claimedAlive, 12=claimedDead
-    // lastRound indicates the highest round they reached
-    if (part.lastRound > 0) {
-      for (let r = 1; r <= part.lastRound; r++) {
-        positions[r] = (positions[r] || 0) + 1;
-      }
+    // lastRound = the round they reached (their elimination/winning round)
+    const round = part.lastRound;
+    if (round > 0) {
+      positions[round] = (positions[round] || 0) + 1;
     }
   }
   return positions;
