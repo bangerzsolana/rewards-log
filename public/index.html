@@ -216,6 +216,14 @@
       letter-spacing: 0.8px;
     }
 
+    .total-box .total-sublabel {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
     /* ── Card grid ────────────────────────── */
 
     .card-grid {
@@ -476,6 +484,7 @@
         <div class="total-box">
           <span class="total-value">${formatNumber(t.amount_parsed)}</span>
           <span class="total-label">${escHtml(t.token_symbol || 'Unknown')}</span>
+          <span class="total-sublabel">Total Rewards</span>
         </div>
       `).join('');
 
