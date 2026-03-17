@@ -181,8 +181,9 @@
     .totals-strip::-webkit-scrollbar { display: none; }
 
     .total-box {
-      flex: 0 0 auto;
-      min-width: 180px;
+      flex: 1 0 0;
+      min-width: 160px;
+      max-width: 240px;
       background: #f4f4f4;
       border-radius: var(--half-radius);
       padding: 12px 16px 12px 12px;
@@ -526,7 +527,7 @@
         <div class="total-box">
           <img class="total-coin" src="${getCoinImage(t.token_symbol)}" alt="${escHtml(t.token_symbol)}" />
           <div class="total-text">
-            <span class="total-value">${formatNumber(t.amount_parsed)}</span>
+            <span class="total-value">${formatTotal(t.amount_parsed)}</span>
             <span class="total-label">${escHtml(t.token_symbol || 'Unknown')}</span>
           </div>
         </div>
@@ -575,6 +576,16 @@
     }
 
     // ── Helpers ─────────────────────────────────
+    function formatTotal(n) {
+      n = Number(n);
+      if (isNaN(n) || n === 0) return '0';
+      if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+      if (n >= 10000) return (n / 1000).toFixed(2) + 'K';
+      if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 1 });
+      if (n < 1) return n.toFixed(4);
+      return n.toFixed(1);
+    }
+
     function formatNumber(n) {
       n = Number(n);
       if (isNaN(n)) return '0';
