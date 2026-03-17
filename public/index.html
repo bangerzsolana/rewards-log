@@ -7,15 +7,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'LuckiestGuy';
+      src: url('/assets/fonts/LuckiestGuy-Regular.ttf') format('truetype');
+    }
+
     :root {
       --pond-bg: #93fff1;
       --black-border: #101010;
       --radius: 22px;
+      --half-radius: 11px;
       --border-width: 2px;
-      --card-green: #e8f8e0;
-      --tab-active: #101010;
-      --tab-inactive: #e0e0e0;
-      --tab-text: #888;
+      --card-green: #D0F8D2;
+      --body-background: #fff8ec;
+      --button-radius: 50px;
+      --theme-error: #F23D4F;
+      --purple: #b29bf4;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,84 +31,46 @@
       font-family: 'Inter', sans-serif;
       background: var(--pond-bg);
       min-height: 100vh;
-      padding: 80px 24px 24px;
+      padding: 40px 24px 24px;
     }
+
+    .game-font { font-family: 'LuckiestGuy', sans-serif; }
 
     .container {
       max-width: 1100px;
       margin: 0 auto;
-    }
-
-    /* ── Header ─────────────────────────────── */
-
-    .page-header {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .page-header h1 {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--black-border);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── Tabs ────────────────────────────────── */
-
-    .tabs {
-      display: flex;
-      border: var(--border-width) solid var(--black-border);
-      border-radius: 50px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .tab {
-      padding: 10px 24px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      border: none;
-      background: #fff;
-      color: var(--tab-text);
-      transition: all 0.15s;
-    }
-
-    .tab.active {
-      background: var(--tab-active);
-      color: #fff;
-      border-radius: 50px;
-    }
-
-    /* ── Wallet input ────────────────────────── */
+    /* ── Wallet input (dev tool) ───────────── */
 
     .wallet-bar {
       display: flex;
       gap: 8px;
-      margin-bottom: 24px;
     }
 
     .wallet-bar input {
       flex: 1;
-      padding: 12px 16px;
+      padding: 11px 14px;
       border: var(--border-width) solid var(--black-border);
-      border-radius: var(--radius);
+      border-radius: var(--half-radius);
       font-size: 14px;
       font-family: 'Inter', sans-serif;
       outline: none;
-      background: #fff;
+      background: #eeeeee;
+      color: var(--black-border);
+      transition: border-color 0.15s;
     }
 
-    .wallet-bar input:focus { border-color: #b29bf4; }
+    .wallet-bar input::placeholder { color: #aaa; }
+    .wallet-bar input:focus { border-color: var(--purple); }
 
     .btn {
       padding: 12px 24px;
       border: var(--border-width) solid var(--black-border);
-      border-radius: 50px;
+      border-radius: var(--button-radius);
       background: var(--black-border);
       color: #fff;
       font-weight: 700;
@@ -109,22 +78,24 @@
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       box-shadow: 4.5px 3px 0px var(--black-border);
-      transition: transform 0.1s, box-shadow 0.1s;
+      transition: transform 0.08s, box-shadow 0.08s;
+      user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .btn:active {
       transform: translate(3px, 2px);
-      box-shadow: 1.5px 1px 0px var(--black-border);
+      box-shadow: none;
     }
 
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── Status ──────────────────────────────── */
+    /* ── Status ──────────────────────────── */
 
     .status-bar {
-      margin-bottom: 16px;
       padding: 8px 16px;
-      border-radius: 12px;
+      border-radius: var(--half-radius);
       background: rgba(0,0,0,0.05);
       font-size: 13px;
       color: #555;
@@ -133,18 +104,83 @@
 
     .status-bar.visible { display: block; }
 
-    /* ── Card grid ───────────────────────────── */
+    /* ── White panel ─────────────────────── */
+
+    .rewards-panel {
+      background: #ffffff;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────── */
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+    }
+
+    .page-title {
+      font-family: 'LuckiestGuy', sans-serif;
+      font-size: 28px;
+      color: var(--black-border);
+      line-height: 1.15;
+    }
+
+    /* ── Tabs (GibTabs pattern) ───────────── */
+
+    .tabs {
+      display: flex;
+      position: relative;
+      border: var(--border-width) solid var(--black-border);
+      border-radius: 100px;
+      background: #fff;
+      padding: 4px;
+      user-select: none;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      border: none;
+      border-radius: 100px;
+      background: transparent;
+      color: rgba(0,0,0,0.35);
+      transition: background 0.12s, color 0.12s;
+      white-space: nowrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tab.active {
+      background: var(--black-border);
+      color: #fff;
+    }
+
+    /* ── Card grid ────────────────────────── */
 
     .card-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
+      padding: 0 24px 24px;
     }
+
+    /* ── Reward card — NO border ──────────── */
 
     .reward-card {
       background: var(--card-green);
-      border: var(--border-width) solid var(--black-border);
-      border-radius: var(--radius);
+      border-radius: var(--half-radius);
       padding: 20px 16px;
       display: flex;
       flex-direction: column;
@@ -160,11 +196,12 @@
     }
 
     .reward-card .tournament-name {
-      font-weight: 800;
-      font-size: 15px;
+      font-family: 'LuckiestGuy', sans-serif;
+      font-size: 16px;
       text-transform: uppercase;
       color: var(--black-border);
-      letter-spacing: 0.3px;
+      letter-spacing: 0.5px;
+      line-height: 1.15;
     }
 
     .reward-card .rounds-label {
@@ -184,9 +221,10 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 13px;
-      font-weight: 700;
+      font-family: 'LuckiestGuy', sans-serif;
+      font-size: 14px;
       color: var(--black-border);
+      line-height: 1.15;
     }
 
     .token-dot {
@@ -197,7 +235,7 @@
       flex-shrink: 0;
     }
 
-    /* ── Battle log placeholder ──────────────── */
+    /* ── Battle log placeholder ────────────── */
 
     .battle-log-placeholder {
       text-align: center;
@@ -206,22 +244,31 @@
       font-size: 15px;
     }
 
-    /* ── Empty / error / loading ─────────────── */
+    /* ── Empty / error / loading ───────────── */
 
     .loading { text-align: center; padding: 40px; font-size: 16px; color: #666; }
     .empty { text-align: center; padding: 60px 20px; color: #999; font-size: 15px; }
-    .error-msg { text-align: center; padding: 20px; color: #F23D4F; font-weight: 600; }
+    .error-msg { text-align: center; padding: 20px; color: var(--theme-error); font-weight: 600; }
 
-    /* ── Responsive ──────────────────────────── */
+    /* ── Responsive ────────────────────────── */
 
-    @media (max-width: 800px) {
-      .card-grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 900px) {
+      .card-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px 20px; }
       .reward-card .stage-img { width: 90px; height: 90px; }
-      body { padding: 60px 16px 16px; }
+      .reward-card .tournament-name { font-size: 14px; }
+      body { padding: 24px 12px 16px; }
+      .page-header { padding: 16px 16px 12px; }
+      .page-title { font-size: 22px; }
+      .tab { font-size: 13px; padding: 7px 16px; }
     }
 
     @media (max-width: 480px) {
       .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .card-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -235,20 +282,22 @@
 
     <div class="status-bar" id="statusBar"></div>
 
-    <div class="page-header">
-      <h1>Rewards</h1>
-      <div class="tabs">
-        <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
-        <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
+    <div class="rewards-panel">
+      <div class="page-header">
+        <span class="page-title">REWARDS</span>
+        <div class="tabs">
+          <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
+          <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
+        </div>
       </div>
-    </div>
 
-    <div id="rewardsTab">
-      <div id="cardGrid"></div>
-    </div>
+      <div id="rewardsTab">
+        <div id="cardGrid"></div>
+      </div>
 
-    <div id="battleTab" style="display:none">
-      <div class="battle-log-placeholder">Nothing here yet.</div>
+      <div id="battleTab" style="display:none">
+        <div class="battle-log-placeholder">Nothing here yet.</div>
+      </div>
     </div>
   </div>
 
