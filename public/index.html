@@ -334,6 +334,93 @@
     .empty { text-align: center; padding: 60px 20px; color: #999; font-size: 15px; }
     .error-msg { text-align: center; padding: 20px; color: var(--theme-error); font-weight: 600; }
 
+    /* ── Skeleton loading ─────────────────── */
+
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s infinite linear;
+      border-radius: 6px;
+    }
+
+    .skeleton-card {
+      background: var(--card-green);
+      border-radius: var(--half-radius);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .skeleton-card .skeleton-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+    }
+
+    .skeleton-card .skeleton-title {
+      width: 80%;
+      height: 18px;
+    }
+
+    .skeleton-card .skeleton-rounds {
+      width: 60%;
+      height: 14px;
+    }
+
+    .skeleton-card .skeleton-prize {
+      width: 70%;
+      height: 14px;
+    }
+
+    .skeleton-total-box {
+      flex: 1 0 0;
+      min-width: 160px;
+      max-width: 240px;
+      background: #f4f4f4;
+      border-radius: var(--half-radius);
+      padding: 12px 16px 12px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .skeleton-total-box .skeleton-coin {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .skeleton-total-box .skeleton-total-text {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .skeleton-total-box .skeleton-total-value {
+      width: 70%;
+      height: 22px;
+    }
+
+    .skeleton-total-box .skeleton-total-label {
+      width: 50%;
+      height: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .skeleton-card .skeleton-img { width: 90px; height: 90px; }
+      .skeleton-total-box { min-width: 150px; padding: 10px 12px 10px 10px; }
+      .skeleton-total-box .skeleton-coin { width: 44px; height: 44px; }
+    }
+
     /* ── Responsive ────────────────────────── */
 
     @media (max-width: 900px) {
@@ -431,6 +518,38 @@
       return `/assets/stage${stage}.png`;
     }
 
+    // ── Skeleton loaders ───────────────────────
+    function showSkeletons() {
+      // Totals skeleton
+      const section = document.getElementById('totalRewardsSection');
+      const strip = document.getElementById('totalsStrip');
+      section.style.display = '';
+      strip.innerHTML = Array(3).fill(`
+        <div class="skeleton-total-box">
+          <div class="skeleton skeleton-coin"></div>
+          <div class="skeleton-total-text">
+            <div class="skeleton skeleton-total-value"></div>
+            <div class="skeleton skeleton-total-label"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Cards skeleton
+      const tournSection = document.getElementById('tournamentRewardsSection');
+      tournSection.style.display = '';
+      document.getElementById('cardGrid').innerHTML = `<div class="card-grid">
+        ${Array(8).fill(`
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-rounds"></div>
+            <div class="skeleton skeleton-prize"></div>
+            <div class="skeleton skeleton-prize"></div>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
     // ── Load wallet ────────────────────────────
     async function loadWallet() {
       const wallet = document.getElementById('walletInput').value.trim();
@@ -442,7 +561,7 @@
       status.className = 'status-bar visible';
       status.textContent = 'Loading rewards from Solana...';
 
-      document.getElementById('cardGrid').innerHTML = '<div class="loading">Fetching tournaments...</div>';
+      showSkeletons();
 
       try {
         const [tournamentsRes, totalsRes] = await Promise.all([
