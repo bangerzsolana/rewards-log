@@ -43,6 +43,7 @@ async function autoMigrate() {
         players INTEGER NOT NULL DEFAULT 0,
         total_rounds INTEGER NOT NULL DEFAULT 0,
         last_round INTEGER NOT NULL DEFAULT 0,
+        flies_count INTEGER NOT NULL DEFAULT 0,
         ended BOOLEAN NOT NULL DEFAULT FALSE,
         positions JSONB NOT NULL DEFAULT '{}',
         prizes JSONB NOT NULL DEFAULT '[]',
@@ -148,10 +149,10 @@ async function syncWallet(wallet) {
     const userLastRound = Math.max(...Object.keys(positions).map(Number), 0);
 
     await pool.query(
-      `INSERT INTO tournament_rewards (wallet, tournament, tournament_name, tournament_index, players, total_rounds, last_round, ended, positions, prizes, computed_prizes, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+      `INSERT INTO tournament_rewards (wallet, tournament, tournament_name, tournament_index, players, total_rounds, last_round, flies_count, ended, positions, prizes, computed_prizes, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
        ON CONFLICT (wallet, tournament)
-       DO UPDATE SET tournament_name = $3, tournament_index = $4, players = $5, total_rounds = $6, last_round = $7, ended = $8, positions = $9, prizes = $10, computed_prizes = $11, updated_at = NOW()`,
+       DO UPDATE SET tournament_name = $3, tournament_index = $4, players = $5, total_rounds = $6, last_round = $7, flies_count = $8, ended = $9, positions = $10, prizes = $11, computed_prizes = $12, updated_at = NOW()`,
       [
         wallet,
         t.tournament,
@@ -160,6 +161,7 @@ async function syncWallet(wallet) {
         t.registeredPlayers,
         t.round,
         userLastRound,
+        t.fliesCount || 0,
         t.ended,
         JSON.stringify(positions),
         JSON.stringify(t.prizes),
@@ -233,7 +235,7 @@ app.get("/api/rewards/tournaments/:wallet", async (req, res) => {
     }
 
     const { rows } = await pool.query(
-      `SELECT tournament, tournament_name, tournament_index, players, total_rounds, last_round, ended, positions, prizes, computed_prizes, updated_at
+      `SELECT tournament, tournament_name, tournament_index, players, total_rounds, last_round, flies_count, ended, positions, prizes, computed_prizes, updated_at
        FROM tournament_rewards
        WHERE wallet = $1
        ORDER BY tournament_index DESC

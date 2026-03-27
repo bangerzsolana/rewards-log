@@ -311,6 +311,14 @@
       flex-shrink: 0;
     }
 
+    .flies-count {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      margin-top: 4px;
+    }
+
     /* ── Battle log placeholder ────────────── */
 
     .battle-log-placeholder {
@@ -554,6 +562,8 @@
           const name = t.tournament_name || 'Tournament #' + (t.tournament_index || '?');
           const prizes = t.computed_prizes || [];
 
+          const fliesCount = t.flies_count || 0;
+
           return `
             <div class="reward-card">
               <img class="stage-img" src="${stageImage(stage)}" alt="Stage ${stage}" />
@@ -567,6 +577,7 @@
                   </div>
                 `).join('')}
               </div>
+              ${fliesCount > 0 ? `<div class="flies-count">🪰 ${fliesCount} flies</div>` : ''}
             </div>
           `;
         }).join('')}
