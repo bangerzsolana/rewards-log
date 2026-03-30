@@ -235,8 +235,8 @@ async function fetchWalletRewards(wallet, startIndex, count = 10) {
     try {
       const parsed = parseTournament(accounts[i].data, pdas[i].pda.toBase58());
       const myPositions = getUserPositions(parsed.parts, wallet);
-      // Count flies: THIS USER's entries eliminated in round 1 (lastRound <= 1)
-      const fliesCount = parsed.parts.filter(p => p.user === wallet && p.lastRound <= 1).length;
+      // Flies = user's entries in the lowest prize tier (round 2 in lastRound maps to fly prize slot)
+      const fliesCount = myPositions[2] || 0;
       if (Object.keys(myPositions).length > 0) {
         tournaments.push({
           ...parsed,
