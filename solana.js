@@ -235,13 +235,10 @@ async function fetchWalletRewards(wallet, startIndex, count = 10) {
     try {
       const parsed = parseTournament(accounts[i].data, pdas[i].pda.toBase58());
       const myPositions = getUserPositions(parsed.parts, wallet);
-      // Flies = user's entries in the lowest prize tier (round 2 in lastRound maps to fly prize slot)
-      const fliesCount = myPositions[2] || 0;
       if (Object.keys(myPositions).length > 0) {
         tournaments.push({
           ...parsed,
           myPositions,
-          fliesCount,
           parts: undefined, // don't send all parts to client
         });
       }

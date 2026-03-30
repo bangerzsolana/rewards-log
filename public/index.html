@@ -311,12 +311,24 @@
       flex-shrink: 0;
     }
 
-    .flies-count {
+    .flies-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #1a5c2a;
+      color: #fff;
+      border-radius: 100px;
+      padding: 4px 10px;
       font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: #888;
-      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .flies-pill svg {
+      width: 14px;
+      height: 14px;
+      fill: #fff;
     }
 
     /* ── Battle log placeholder ────────────── */
@@ -681,8 +693,6 @@
           const name = t.tournament_name || 'Tournament #' + (t.tournament_index || '?');
           const prizes = t.computed_prizes || [];
 
-          const fliesCount = t.flies_count || 0;
-
           return `
             <div class="reward-card">
               <img class="stage-img" src="${stageImage(stage)}" alt="Stage ${stage}" />
@@ -696,7 +706,10 @@
                   </div>
                 `).join('')}
               </div>
-              ${fliesCount > 0 ? `<div class="flies-count">🪰 ${fliesCount} flies</div>` : ''}
+              <div class="flies-pill">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="2"/><circle cx="16" cy="8" r="2"/><ellipse cx="12" cy="15" rx="6" ry="5"/><path d="M6 10 Q2 6 4 2" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"/><path d="M18 10 Q22 6 20 2" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"/></svg>
+                10
+              </div>
             </div>
           `;
         }).join('')}
