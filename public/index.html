@@ -44,53 +44,6 @@
       gap: 16px;
     }
 
-    /* ── Wallet input (dev tool) ───────────── */
-
-    .wallet-bar {
-      display: flex;
-      gap: 8px;
-    }
-
-    .wallet-bar input {
-      flex: 1;
-      padding: 11px 14px;
-      border: var(--border-width) solid var(--black-border);
-      border-radius: var(--half-radius);
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      outline: none;
-      background: #eeeeee;
-      color: var(--black-border);
-      transition: border-color 0.15s;
-    }
-
-    .wallet-bar input::placeholder { color: #aaa; }
-    .wallet-bar input:focus { border-color: var(--purple); }
-
-    .btn {
-      padding: 12px 24px;
-      border: var(--border-width) solid var(--black-border);
-      border-radius: var(--button-radius);
-      background: var(--black-border);
-      color: #fff;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      box-shadow: 4.5px 3px 0px var(--black-border);
-      transition: transform 0.08s, box-shadow 0.08s;
-      user-select: none;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .btn:active {
-      transform: translate(3px, 2px);
-      box-shadow: none;
-    }
-
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
     /* ── Status ──────────────────────────── */
 
     .status-bar {
@@ -465,12 +418,6 @@
 </head>
 <body>
   <div class="container">
-    <div class="wallet-bar">
-      <input type="text" id="walletInput" placeholder="Enter wallet address..." onkeydown="if(event.key==='Enter')loadWallet()" />
-      <button class="btn" onclick="loadWallet()">Load</button>
-      <button class="btn" id="resyncBtn" onclick="resyncWallet()" style="display:none">Re-sync</button>
-    </div>
-
     <div class="status-bar" id="statusBar"></div>
 
     <div class="rewards-panel">
@@ -497,10 +444,33 @@
         <div class="battle-log-placeholder">Nothing here yet.</div>
       </div>
     </div>
+
+    <div style="text-align:center;padding:24px 0 8px">
+      <span id="loadNewBtn" style="font-size:13px;color:#888;cursor:pointer;user-select:none" onclick="cycleWallet()">Load new</span>
+    </div>
   </div>
 
   <script>
     const API = window.location.origin;
+
+    const WALLETS = [
+      'Acacsff4jU3KRh2xhG4mHan8RtkamW8fU1AWsTNE4Ldo',
+      'FAShBHsY6cMvoyCTV1oopUBFKPEkftMTwP9SqCFuQCDo',
+      '9DC9GpSzGFwpN7goAZZNP3LvRPHz6mdjRoAd9hVVUyDf',
+      '6fE1hveCTvNrE9CWT2aEmwJwhFSQ6WQ3G26utgZL5FRb',
+      'B3zU4q7UQ1GBa7Vjro2orBojD9YiFZ3w5UU1WZCyz4Hr',
+      'HQ3bmnUrcZHb6V3wooQ77BDBBZL9gt4mmsThfPKKDNnQ',
+    ];
+    let currentWalletIndex = Math.floor(Math.random() * WALLETS.length);
+
+    function getCurrentWallet() {
+      return WALLETS[currentWalletIndex];
+    }
+
+    function cycleWallet() {
+      currentWalletIndex = (currentWalletIndex + 1) % WALLETS.length;
+      loadWallet();
+    }
 
     // ── Tab switching ──────────────────────────
     function switchTab(tab) {
@@ -510,13 +480,8 @@
       document.getElementById('battleTab').style.display = tab === 'battle' ? '' : 'none';
     }
 
-    // ── URL params ─────────────────────────────
-    const params = new URLSearchParams(window.location.search);
-    const urlWallet = params.get('wallet');
-    if (urlWallet) {
-      document.getElementById('walletInput').value = urlWallet;
-      loadWallet();
-    }
+    // ── Auto-load on page load ─────────────────
+    loadWallet();
 
     // ── Stage logic ────────────────────────────
     function getStage(lastRound, totalRounds) {
@@ -570,10 +535,7 @@
 
     // ── Load wallet ────────────────────────────
     async function loadWallet() {
-      const wallet = document.getElementById('walletInput').value.trim();
-      if (!wallet) return;
-
-      history.replaceState(null, '', `?wallet=${wallet}`);
+      const wallet = getCurrentWallet();
 
       const status = document.getElementById('statusBar');
       status.className = 'status-bar visible';
@@ -606,36 +568,10 @@
 
         status.textContent = `${data.total} tournaments loaded.`;
         setTimeout(() => { status.className = 'status-bar'; }, 3000);
-        document.getElementById('resyncBtn').style.display = '';
 
       } catch (err) {
         document.getElementById('cardGrid').innerHTML = `<div class="error-msg">${err.message}</div>`;
         status.className = 'status-bar';
-      }
-    }
-
-    // ── Re-sync ────────────────────────────────
-    async function resyncWallet() {
-      const wallet = document.getElementById('walletInput').value.trim();
-      if (!wallet) return;
-
-      const btn = document.getElementById('resyncBtn');
-      btn.disabled = true;
-      btn.textContent = 'Re-syncing...';
-
-      const status = document.getElementById('statusBar');
-      status.className = 'status-bar visible';
-      status.textContent = 'Force re-syncing from Solana...';
-
-      try {
-        await fetch(`${API}/api/rewards/sync/${wallet}`, { method: 'POST' });
-        btn.textContent = 'Re-sync';
-        btn.disabled = false;
-        await loadWallet();
-      } catch (err) {
-        btn.textContent = 'Re-sync';
-        btn.disabled = false;
-        status.textContent = err.message;
       }
     }
 
