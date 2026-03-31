@@ -77,8 +77,11 @@ const TOKEN_MAP = {
 // ── Sync logic ──────────────────────────────────────────────────────
 
 const SYNC_TTL_MS = 5 * 60 * 1000; // 5 min
+const SYNC_TIMEOUT_MS = 30 * 1000; // 30 sec max for sync
+const syncingWallets = new Set(); // prevent concurrent syncs
 
 async function shouldSync(wallet) {
+  if (syncingWallets.has(wallet)) return false; // already syncing
   const { rows } = await pool.query(
     "SELECT synced_at FROM wallet_sync WHERE wallet = $1",
     [wallet]
@@ -89,6 +92,19 @@ async function shouldSync(wallet) {
 }
 
 async function syncWallet(wallet) {
+  if (syncingWallets.has(wallet)) return;
+  syncingWallets.add(wallet);
+  try {
+  await Promise.race([
+    _doSync(wallet),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Sync timeout")), SYNC_TIMEOUT_MS)),
+  ]);
+  } finally {
+    syncingWallets.delete(wallet);
+  }
+}
+
+async function _doSync(wallet) {
   console.log(`Syncing wallet ${wallet}...`);
 
   // Get the latest tournament index from the board
@@ -195,15 +211,11 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "rewards-log" });
 });
 
-// Get totals for a wallet
+// Get totals for a wallet (reads from DB only — sync is triggered by /tournaments)
 app.get("/api/rewards/totals/:wallet", async (req, res) => {
   try {
     const { wallet } = req.params;
     if (!wallet) return res.status(400).json({ error: "wallet required" });
-
-    if (await shouldSync(wallet)) {
-      await syncWallet(wallet);
-    }
 
     const { rows } = await pool.query(
       "SELECT half_currency_hash, amount, amount_parsed, token_symbol, token_decimals FROM reward_totals WHERE wallet = $1",
@@ -227,8 +239,9 @@ app.get("/api/rewards/tournaments/:wallet", async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const offset = page * limit;
 
+    // Trigger sync in background — don't block the response
     if (await shouldSync(wallet)) {
-      await syncWallet(wallet);
+      syncWallet(wallet).catch(err => console.error("Background sync error:", err.message));
     }
 
     const { rows } = await pool.query(

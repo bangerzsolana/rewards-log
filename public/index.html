@@ -461,12 +461,14 @@
       'HQ3bmnUrcZHb6V3wooQ77BDBBZL9gt4mmsThfPKKDNnQ',
     ];
     let currentWalletIndex = Math.floor(Math.random() * WALLETS.length);
+    let retryTimer = null;
 
     function getCurrentWallet() {
       return WALLETS[currentWalletIndex];
     }
 
     function cycleWallet() {
+      if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
       currentWalletIndex = (currentWalletIndex + 1) % WALLETS.length;
       loadWallet();
     }
@@ -564,6 +566,13 @@
 
         renderTotals(totalsData.totals || []);
         renderCards(data.tournaments);
+
+        // If no data yet (first sync in progress), retry in 5s
+        if (data.total === 0 && !retryTimer) {
+          status.textContent = 'Syncing wallet data from Solana... reloading shortly.';
+          retryTimer = setTimeout(() => { retryTimer = null; loadWallet(); }, 5000);
+          return;
+        }
 
         status.textContent = `${data.total} tournaments loaded.`;
         setTimeout(() => { status.className = 'status-bar'; }, 3000);
