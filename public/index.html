@@ -96,6 +96,7 @@
       user-select: none;
       cursor: pointer;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
     .tab {
@@ -414,8 +415,9 @@
     }
 
     @media (max-width: 480px) {
-      .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
       .card-grid { grid-template-columns: 1fr 1fr; }
+      .page-title { font-size: 18px; }
+      .tab { font-size: 12px; padding: 6px 12px; }
     }
   </style>
 </head>
@@ -425,10 +427,10 @@
 
     <div class="rewards-panel">
       <div class="page-header">
-        <span class="page-title">REWARDS LOG</span>
+        <span class="page-title" id="pageTitle">REWARDS LOG</span>
         <div class="tabs">
-          <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards Log</button>
-          <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battle Log</button>
+          <button class="tab active" id="tabRewards" onclick="switchTab('rewards')">Rewards</button>
+          <button class="tab" id="tabBattle" onclick="switchTab('battle')">Battles</button>
         </div>
       </div>
 
@@ -483,6 +485,7 @@
       document.getElementById('tabBattle').className = tab === 'battle' ? 'tab active' : 'tab';
       document.getElementById('rewardsTab').style.display = tab === 'rewards' ? '' : 'none';
       document.getElementById('battleTab').style.display = tab === 'battle' ? '' : 'none';
+      document.getElementById('pageTitle').textContent = tab === 'rewards' ? 'REWARDS LOG' : 'BATTLE LOG';
     }
 
     // ── Auto-load on page load ─────────────────
