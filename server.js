@@ -15,10 +15,9 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 // ── Auto-migrate on startup ─────────────────────────────────────────
 
 async function autoMigrate() {
-  const client = await pool.connect();
+  let client;
   try {
-    // Drop all tables to ensure schema is up to date
-    await client.query("DROP TABLE IF EXISTS reward_totals, tournament_rewards, wallet_sync");
+    client = await pool.connect();
     await client.query(`
       CREATE TABLE IF NOT EXISTS reward_totals (
         id SERIAL PRIMARY KEY,
@@ -64,7 +63,7 @@ async function autoMigrate() {
   } catch (err) {
     console.error("Auto-migration failed:", err.message);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
 
@@ -324,8 +323,10 @@ app.get("/api/debug/tournament/:index/:wallet", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-autoMigrate().then(() => {
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Rewards Log API running on port ${PORT}`);
+autoMigrate()
+  .catch((err) => console.error("Migration error (server starting anyway):", err.message))
+  .then(() => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Rewards Log API running on port ${PORT}`);
+    });
   });
-});

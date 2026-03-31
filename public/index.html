@@ -586,6 +586,12 @@
           fetch(`${API}/api/rewards/tournaments/${wallet}?limit=100`),
           fetch(`${API}/api/rewards/totals/${wallet}`),
         ]);
+
+        if (!tournamentsRes.ok || !totalsRes.ok) {
+          const errBody = await tournamentsRes.json().catch(() => ({}));
+          throw new Error(errBody.error || `Server error (${tournamentsRes.status})`);
+        }
+
         const data = await tournamentsRes.json();
         const totalsData = await totalsRes.json();
 
