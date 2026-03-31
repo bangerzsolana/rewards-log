@@ -265,10 +265,13 @@
       gap: 8px;
     }
 
-    .reward-card .stage-img {
+    .reward-card .stage-icon {
       width: 120px;
       height: 120px;
-      object-fit: contain;
+      background-image: url('/assets/trophies.png');
+      background-size: 400% 100%;
+      background-repeat: no-repeat;
+      flex-shrink: 0;
     }
 
     .reward-card .tournament-name {
@@ -325,10 +328,10 @@
       margin-top: 6px;
     }
 
-    .flies-pill svg {
+    .flies-pill img {
       width: 14px;
       height: 14px;
-      fill: #fff;
+      filter: brightness(0) invert(1);
     }
 
     /* ── Battle log placeholder ────────────── */
@@ -373,7 +376,7 @@
     .skeleton-card .skeleton-img {
       width: 120px;
       height: 120px;
-      border-radius: 50%;
+      border-radius: 8px;
     }
 
     .skeleton-card .skeleton-title {
@@ -446,7 +449,7 @@
       .total-coin { width: 44px; height: 44px; }
       .total-box .total-value { font-size: 20px; }
       .card-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px 20px; }
-      .reward-card .stage-img { width: 90px; height: 90px; }
+      .reward-card .stage-icon { width: 90px; height: 90px; }
       .reward-card .tournament-name { font-size: 14px; }
       body { padding: 24px 12px 16px; }
       .page-header { padding: 16px 16px 12px; }
@@ -526,8 +529,11 @@
       return 3;
     }
 
-    function stageImage(stage) {
-      return `/assets/stage${stage}.png`;
+    function stagePosition(stage) {
+      // Sprite sheet: 4 assets, each 500px wide in a 2000px image
+      // background-position percentages: 0%, 33.333%, 66.666%, 100%
+      const positions = ['0%', '33.333%', '66.666%', '100%'];
+      return positions[stage] || '0%';
     }
 
     // ── Skeleton loaders ───────────────────────
@@ -695,7 +701,7 @@
 
           return `
             <div class="reward-card">
-              <img class="stage-img" src="${stageImage(stage)}" alt="Stage ${stage}" />
+              <div class="stage-icon" style="background-position: ${stagePosition(stage)} 0"></div>
               <div class="tournament-name">${escHtml(name)}</div>
               <div class="rounds-label">You won ${lastRound} round${lastRound !== 1 ? 's' : ''}</div>
               <div class="prizes-list">
@@ -707,7 +713,7 @@
                 `).join('')}
               </div>
               <div class="flies-pill">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="2"/><circle cx="16" cy="8" r="2"/><ellipse cx="12" cy="15" rx="6" ry="5"/><path d="M6 10 Q2 6 4 2" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"/><path d="M18 10 Q22 6 20 2" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <img src="/gib-assets/fly.svg" alt="flies" />
                 10
               </div>
             </div>
