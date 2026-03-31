@@ -243,9 +243,6 @@
       font-weight: 500;
     }
 
-    .card-spacer {
-      flex-grow: 1;
-    }
 
     .reward-card .prizes-list {
       display: flex;
@@ -661,7 +658,7 @@
               <div class="stage-icon" style="background-position: ${stagePosition(stage)} 0"></div>
               <div class="tournament-name">${escHtml(name)}</div>
               <div class="rounds-label">You won ${lastRound} round${lastRound !== 1 ? 's' : ''}</div>
-              ${stage === 0 ? '<div class="card-spacer"></div>' : `<div class="prizes-list">
+              ${stage === 0 ? '' : `<div class="prizes-list">
                 ${prizes.map(p => `
                   <div class="prize-line">
                     <span class="token-dot"></span>
