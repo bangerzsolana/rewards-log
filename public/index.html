@@ -498,9 +498,16 @@
     ];
 
     function getSpriteSheet(tournamentIndex) {
-      // Simple hash from tournament index for consistent assignment
-      const hash = ((tournamentIndex * 2654435761) >>> 0) % SPRITE_SHEETS.length;
-      return SPRITE_SHEETS[hash];
+      // Shuffle sprite sheets with a fixed seed so the order is random
+      // but consistent across page loads, and adjacent tournaments never share colors
+      const shuffled = [...SPRITE_SHEETS];
+      let seed = 48271;
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        seed = (seed * 16807) % 2147483647;
+        const j = seed % (i + 1);
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled[tournamentIndex % shuffled.length];
     }
 
     // ── Stage logic ────────────────────────────
