@@ -183,24 +183,32 @@ async function _doSync(wallet) {
     );
   }
 
-  // Clear old totals and write fresh
-  await pool.query("DELETE FROM reward_totals WHERE wallet = $1", [wallet]);
-  for (const [symbol, data] of Object.entries(totals)) {
-    await pool.query(
-      `INSERT INTO reward_totals (wallet, half_currency_hash, amount, amount_parsed, token_symbol, token_decimals, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
-      [wallet, data.halfCurrencyHash, data.amount, data.amount, symbol, data.decimals]
+  // Clear old totals and write fresh — use a transaction so /totals never reads an empty table mid-sync
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("DELETE FROM reward_totals WHERE wallet = $1", [wallet]);
+    for (const [symbol, data] of Object.entries(totals)) {
+      await client.query(
+        `INSERT INTO reward_totals (wallet, half_currency_hash, amount, amount_parsed, token_symbol, token_decimals, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+        [wallet, data.halfCurrencyHash, data.amount, data.amount, symbol, data.decimals]
+      );
+    }
+    await client.query(
+      `INSERT INTO wallet_sync (wallet, last_tournament_index, synced_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (wallet)
+       DO UPDATE SET last_tournament_index = GREATEST(wallet_sync.last_tournament_index, $2), synced_at = NOW()`,
+      [wallet, upTo]
     );
+    await client.query("COMMIT");
+  } catch (txErr) {
+    await client.query("ROLLBACK");
+    throw txErr;
+  } finally {
+    client.release();
   }
-
-  // Update sync state
-  await pool.query(
-    `INSERT INTO wallet_sync (wallet, last_tournament_index, synced_at)
-     VALUES ($1, $2, NOW())
-     ON CONFLICT (wallet)
-     DO UPDATE SET last_tournament_index = GREATEST(wallet_sync.last_tournament_index, $2), synced_at = NOW()`,
-    [wallet, upTo]
-  );
 
   console.log(`Sync complete for ${wallet}`);
 }

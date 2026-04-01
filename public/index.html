@@ -625,14 +625,14 @@
         if (nonZero.length) {
           totalsLoaded = true;
           renderTotals(totals);
-        } else if (attempt < 6) {
-          // Totals might be empty during sync — retry up to 5 times
+        } else if (attempt < 12) {
+          // Totals might be empty during sync (can take up to 30s) — retry up to 11 times
           totalsRetryTimer = setTimeout(() => loadTotals(wallet, attempt + 1), 3000);
         }
         // If all retries exhausted with no data, skeleton just stays — better than hiding
       } catch (err) {
         // Silent fail — skeleton stays visible rather than hiding
-        if (attempt < 6) {
+        if (attempt < 12) {
           totalsRetryTimer = setTimeout(() => loadTotals(wallet, attempt + 1), 3000);
         }
       }
