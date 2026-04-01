@@ -134,7 +134,6 @@ async function _doSync(wallet) {
   console.log(`Found ${allTournaments.length} tournaments with rewards for ${wallet}`);
 
   // Store each tournament
-  const totals = {}; // halfCurrencyHash → total amount
   for (const t of allTournaments) {
     const positions = t.myPositions;
     const posArray = Object.entries(positions).map(([round, amount]) => ({ round, amount }));
@@ -150,13 +149,6 @@ async function _doSync(wallet) {
       });
     } catch (e) {
       console.error(`Prize calc error for tournament ${t.index}:`, e.message);
-    }
-
-    // Accumulate totals by token symbol
-    for (const cp of computedPrizes) {
-      const key = cp.symbol || "SOL";
-      if (!totals[key]) totals[key] = { amount: 0, symbol: key, decimals: cp.decimals, halfCurrencyHash: cp.halfCurrencyHash || 0 };
-      totals[key].amount += cp.parsed;
     }
 
     // Get user's best lastRound from positions
@@ -183,12 +175,29 @@ async function _doSync(wallet) {
     );
   }
 
-  // Clear old totals and write fresh — use a transaction so /totals never reads an empty table mid-sync
+  // Recompute totals from ALL stored tournaments (not just the newly synced batch)
+  // This ensures totals survive incremental syncs where only new tournaments are fetched
+  const { rows: allStoredTournaments } = await pool.query(
+    "SELECT computed_prizes FROM tournament_rewards WHERE wallet = $1",
+    [wallet]
+  );
+
+  const fullTotals = {};
+  for (const row of allStoredTournaments) {
+    const prizes = row.computed_prizes || [];
+    for (const cp of prizes) {
+      const key = cp.symbol || "SOL";
+      if (!fullTotals[key]) fullTotals[key] = { amount: 0, symbol: key, decimals: cp.decimals, halfCurrencyHash: cp.halfCurrencyHash || 0 };
+      fullTotals[key].amount += cp.parsed;
+    }
+  }
+
+  // Write totals in a transaction so /totals never reads an empty table mid-sync
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
     await client.query("DELETE FROM reward_totals WHERE wallet = $1", [wallet]);
-    for (const [symbol, data] of Object.entries(totals)) {
+    for (const [symbol, data] of Object.entries(fullTotals)) {
       await client.query(
         `INSERT INTO reward_totals (wallet, half_currency_hash, amount, amount_parsed, token_symbol, token_decimals, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
