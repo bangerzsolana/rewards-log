@@ -485,9 +485,6 @@
       document.getElementById('pageTitle').textContent = tab === 'rewards' ? 'REWARDS LOG' : 'BATTLE LOG';
     }
 
-    // ── Auto-load on page load ─────────────────
-    loadWallet();
-
     // ── Sprite sheet assignment ─────────────────
     const SPRITE_SHEETS = [
       '/assets/assets_01.png', '/assets/assets_02.png', '/assets/assets_03.png',
@@ -757,6 +754,9 @@
       d.textContent = s;
       return d.innerHTML;
     }
+
+    // ── Auto-load on page load ─────────────────
+    loadWallet();
   </script>
 </body>
 </html>
