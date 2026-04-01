@@ -641,19 +641,21 @@
 
     // ── Render totals strip ─────────────────────
     const COIN_IMAGES = {
-      SOL: '/assets/coins/SOL.png',
-      BONK: '/assets/coins/BONK.png',
-      SEND: '/assets/coins/SEND.png',
-      POPCAT: '/assets/coins/POPCAT.png',
-      MPLX: '/assets/coins/MPLX.png',
-      CHONKY: '/assets/coins/CHONKY.png',
-      USDC: '/assets/coins/USDC.png',
-      SKR: '/assets/coins/SKR.png',
-      TROLL: '/assets/coins/TROLL.png',
+      SOL: '/assets/3D coins/3DCoins_500px__0022_SOL.png.png',
+      BONK: '/assets/3D coins/3DCoins_500px__0002_BONK.png',
+      WIF: '/assets/3D coins/3DCoins_500px__0003_WIF.png',
+      WEN: '/assets/3D coins/3DCoins_500px__0004_WEN.png',
+      POPCAT: '/assets/3D coins/3DCoins_500px__0007_POPCAT.png',
+      ENTROPY: '/assets/3D coins/3DCoins_500px__0016_ENTROPY.png',
+      CHONKY: '/assets/3D coins/3DCoins_500px__0017_CHONKY.png',
+      TROLL: '/assets/3D coins/3DCoins_500px__0019_TROLL.png',
+      MPLX: '/assets/3D coins/3DCoins_500px__0020_MPLX.png',
+      USDC: '/assets/3D coins/3DCoins_500px__0001_USDC.png',
+      SKR: '/assets/3D coins/SKR COIN.png',
     };
 
     function getCoinImage(symbol) {
-      return COIN_IMAGES[symbol] || '/assets/coins/placeholder.png';
+      return COIN_IMAGES[symbol] || COIN_IMAGES['SOL'];
     }
 
     function renderTotals(totals) {
