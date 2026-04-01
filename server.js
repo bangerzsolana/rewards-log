@@ -75,7 +75,7 @@ async function autoMigrate() {
 
 const SYNC_TTL_MS = 5 * 60 * 1000; // 5 min
 const SYNC_TIMEOUT_MS = 30 * 1000; // 30 sec max for sync
-const SYNC_VERSION = 2; // Bump this when TOKEN_MAP changes to force re-sync
+const SYNC_VERSION = 3; // Bump this when TOKEN_MAP changes to force re-sync
 const syncingWallets = new Set(); // prevent concurrent syncs
 
 async function shouldSync(wallet) {
