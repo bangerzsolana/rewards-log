@@ -431,7 +431,7 @@
       </div>
 
       <div id="rewardsTab">
-        <div id="totalRewardsSection" style="display:none">
+        <div id="totalRewardsSection">
           <div class="section-title">Total Rewards</div>
           <div id="totalsStrip" class="totals-strip"></div>
         </div>
@@ -471,6 +471,7 @@
 
     function cycleWallet() {
       if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+      if (totalsRetryTimer) { clearTimeout(totalsRetryTimer); totalsRetryTimer = null; }
       currentWalletIndex = (currentWalletIndex + 1) % WALLETS.length;
       loadWallet();
     }
@@ -561,8 +562,13 @@
     }
 
     // ── Load wallet ────────────────────────────
+    let totalsRetryTimer = null;
+    let totalsLoaded = false;
+
     async function loadWallet() {
       const wallet = getCurrentWallet();
+      totalsLoaded = false;
+      if (totalsRetryTimer) { clearTimeout(totalsRetryTimer); totalsRetryTimer = null; }
 
       const status = document.getElementById('statusBar');
       status.className = 'status-bar visible';
@@ -570,19 +576,20 @@
 
       showSkeletons();
 
-      try {
-        const [tournamentsRes, totalsRes] = await Promise.all([
-          fetch(`${API}/api/rewards/tournaments/${wallet}?limit=100`),
-          fetch(`${API}/api/rewards/totals/${wallet}`),
-        ]);
+      // Load tournaments and totals independently so one doesn't block the other
+      loadTournaments(wallet, status);
+      loadTotals(wallet);
+    }
 
-        if (!tournamentsRes.ok || !totalsRes.ok) {
-          const errBody = await tournamentsRes.json().catch(() => ({}));
-          throw new Error(errBody.error || `Server error (${tournamentsRes.status})`);
+    async function loadTournaments(wallet, status) {
+      try {
+        const res = await fetch(`${API}/api/rewards/tournaments/${wallet}?limit=100`);
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || `Server error (${res.status})`);
         }
 
-        const data = await tournamentsRes.json();
-        const totalsData = await totalsRes.json();
+        const data = await res.json();
 
         if (data.error) {
           document.getElementById('cardGrid').innerHTML = `<div class="error-msg">${data.error}</div>`;
@@ -590,7 +597,6 @@
           return;
         }
 
-        renderTotals(totalsData.totals || []);
         renderCards(data.tournaments);
 
         // If no data yet (first sync in progress), retry in 5s
@@ -606,6 +612,32 @@
       } catch (err) {
         document.getElementById('cardGrid').innerHTML = `<div class="error-msg">${err.message}</div>`;
         status.className = 'status-bar';
+      }
+    }
+
+    async function loadTotals(wallet, attempt) {
+      attempt = attempt || 1;
+      try {
+        const res = await fetch(`${API}/api/rewards/totals/${wallet}`);
+        if (!res.ok) return; // silent fail — skeleton stays visible
+
+        const data = await res.json();
+        const totals = data.totals || [];
+        const nonZero = totals.filter(t => Number(t.amount_parsed) > 0);
+
+        if (nonZero.length) {
+          totalsLoaded = true;
+          renderTotals(totals);
+        } else if (attempt < 6) {
+          // Totals might be empty during sync — retry up to 5 times
+          totalsRetryTimer = setTimeout(() => loadTotals(wallet, attempt + 1), 3000);
+        }
+        // If all retries exhausted with no data, skeleton just stays — better than hiding
+      } catch (err) {
+        // Silent fail — skeleton stays visible rather than hiding
+        if (attempt < 6) {
+          totalsRetryTimer = setTimeout(() => loadTotals(wallet, attempt + 1), 3000);
+        }
       }
     }
 
@@ -632,10 +664,10 @@
       // Filter out zero values
       const nonZero = totals.filter(t => Number(t.amount_parsed) > 0);
 
-      if (!nonZero.length) {
-        section.style.display = 'none';
-        return;
-      }
+      // Always keep section visible — skeleton stays if no data yet
+      section.style.display = '';
+
+      if (!nonZero.length) return;
 
       // Sort: SOL first, then alphabetically by symbol
       nonZero.sort((a, b) => {
@@ -653,8 +685,6 @@
           </div>
         </div>
       `).join('');
-
-      section.style.display = '';
     }
 
     // ── Render cards ───────────────────────────
