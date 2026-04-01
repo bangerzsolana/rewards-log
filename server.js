@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
-const { computeUserPrizes, thousandify } = require("./prizes");
+const { TOKEN_MAP, computeUserPrizes, thousandify } = require("./prizes");
 const { getBoardInfo, fetchWalletRewards } = require("./solana");
 
 const app = express();
@@ -59,6 +59,8 @@ async function autoMigrate() {
     `);
     await client.query("CREATE INDEX IF NOT EXISTS idx_reward_totals_wallet ON reward_totals(wallet)");
     await client.query("CREATE INDEX IF NOT EXISTS idx_tournament_rewards_wallet ON tournament_rewards(wallet)");
+    // Add sync_version column if missing (for TOKEN_MAP change detection)
+    await client.query("ALTER TABLE wallet_sync ADD COLUMN IF NOT EXISTS sync_version INTEGER DEFAULT 0").catch(() => {});
     console.log("Auto-migration complete.");
   } catch (err) {
     console.error("Auto-migration failed:", err.message);
@@ -67,27 +69,25 @@ async function autoMigrate() {
   }
 }
 
-// ── Known token map (halfCurrencyHash → metadata) ───────────────────
-// These are the tokens seen in the rewards screenshot
-const TOKEN_MAP = {
-  0: { symbol: "SOL", decimals: 9, mint: null },
-  // Add more as we discover them from on-chain data
-};
+// TOKEN_MAP imported from prizes.js (single source of truth)
 
 // ── Sync logic ──────────────────────────────────────────────────────
 
 const SYNC_TTL_MS = 5 * 60 * 1000; // 5 min
 const SYNC_TIMEOUT_MS = 30 * 1000; // 30 sec max for sync
+const SYNC_VERSION = 2; // Bump this when TOKEN_MAP changes to force re-sync
 const syncingWallets = new Set(); // prevent concurrent syncs
 
 async function shouldSync(wallet) {
   if (syncingWallets.has(wallet)) return false; // already syncing
   const { rows } = await pool.query(
-    "SELECT synced_at FROM wallet_sync WHERE wallet = $1",
+    "SELECT synced_at, sync_version FROM wallet_sync WHERE wallet = $1",
     [wallet]
   );
   if (!rows.length) return true;
   if (!rows[0].synced_at) return true;
+  // Force re-sync if TOKEN_MAP was updated (version mismatch)
+  if ((rows[0].sync_version || 0) < SYNC_VERSION) return true;
   return Date.now() - new Date(rows[0].synced_at).getTime() > SYNC_TTL_MS;
 }
 
@@ -186,8 +186,11 @@ async function _doSync(wallet) {
   for (const row of allStoredTournaments) {
     const prizes = row.computed_prizes || [];
     for (const cp of prizes) {
-      const key = cp.symbol || "SOL";
-      if (!fullTotals[key]) fullTotals[key] = { amount: 0, symbol: key, decimals: cp.decimals, halfCurrencyHash: cp.halfCurrencyHash || 0 };
+      // Always resolve symbol from current TOKEN_MAP (not stale stored symbol)
+      const hash = cp.halfCurrencyHash || 0;
+      const tokenInfo = TOKEN_MAP[hash] || TOKEN_MAP[0];
+      const key = tokenInfo.symbol;
+      if (!fullTotals[key]) fullTotals[key] = { amount: 0, symbol: key, decimals: tokenInfo.decimals, halfCurrencyHash: hash };
       fullTotals[key].amount += cp.parsed;
     }
   }
@@ -205,11 +208,11 @@ async function _doSync(wallet) {
       );
     }
     await client.query(
-      `INSERT INTO wallet_sync (wallet, last_tournament_index, synced_at)
-       VALUES ($1, $2, NOW())
+      `INSERT INTO wallet_sync (wallet, last_tournament_index, synced_at, sync_version)
+       VALUES ($1, $2, NOW(), $3)
        ON CONFLICT (wallet)
-       DO UPDATE SET last_tournament_index = GREATEST(wallet_sync.last_tournament_index, $2), synced_at = NOW()`,
-      [wallet, upTo]
+       DO UPDATE SET last_tournament_index = GREATEST(wallet_sync.last_tournament_index, $2), synced_at = NOW(), sync_version = $3`,
+      [wallet, upTo, SYNC_VERSION]
     );
     await client.query("COMMIT");
   } catch (txErr) {
@@ -275,9 +278,22 @@ app.get("/api/rewards/tournaments/:wallet", async (req, res) => {
       [wallet]
     );
 
+    // Re-map symbols in computed_prizes using current TOKEN_MAP
+    // (handles stale data stored before new tokens were added)
+    const tournaments = rows.map(row => {
+      if (row.computed_prizes && Array.isArray(row.computed_prizes)) {
+        row.computed_prizes = row.computed_prizes.map(cp => {
+          const hash = cp.halfCurrencyHash || 0;
+          const tokenInfo = TOKEN_MAP[hash] || TOKEN_MAP[0];
+          return { ...cp, symbol: tokenInfo.symbol, decimals: tokenInfo.decimals };
+        });
+      }
+      return row;
+    });
+
     res.json({
       wallet,
-      tournaments: rows,
+      tournaments,
       total: parseInt(countRows[0].total),
       page,
       limit,

@@ -225,6 +225,7 @@ function thousandify(n, decimals = 3) {
 }
 
 module.exports = {
+  TOKEN_MAP,
   calculateRoundsAndRemainings,
   calculatePrizeDistribution,
   computeUserPrizes,
