@@ -222,7 +222,6 @@
     .reward-card .stage-icon {
       width: 120px;
       height: 120px;
-      background-image: url('/assets/trophies.png');
       background-size: 400% 100%;
       background-repeat: no-repeat;
       flex-shrink: 0;
@@ -247,8 +246,8 @@
     .reward-card .prizes-list {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      margin-top: 4px;
+      gap: 8px;
+      margin-top: 6px;
     }
 
     .prize-line {
@@ -488,6 +487,22 @@
     // ── Auto-load on page load ─────────────────
     loadWallet();
 
+    // ── Sprite sheet assignment ─────────────────
+    const SPRITE_SHEETS = [
+      '/assets/assets_01.png', '/assets/assets_02.png', '/assets/assets_03.png',
+      '/assets/assets_04.png', '/assets/assets_05.png', '/assets/assets_06.png',
+      '/assets/assets_07.png', '/assets/assets_08.png', '/assets/assets_09.png',
+      '/assets/assets_10.png', '/assets/assets_11.png', '/assets/assets_12.png',
+      '/assets/assets_13.png', '/assets/assets_14.png', '/assets/assets_15.png',
+      '/assets/assets_16.png', '/assets/assets_17.png',
+    ];
+
+    function getSpriteSheet(tournamentIndex) {
+      // Simple hash from tournament index for consistent assignment
+      const hash = ((tournamentIndex * 2654435761) >>> 0) % SPRITE_SHEETS.length;
+      return SPRITE_SHEETS[hash];
+    }
+
     // ── Stage logic ────────────────────────────
     function getStage(lastRound, totalRounds) {
       if (lastRound <= 1) return 0;
@@ -646,16 +661,17 @@
       tournSection.style.display = '';
 
       const html = `<div class="card-grid">
-        ${tournaments.map(t => {
+        ${tournaments.map((t, i) => {
           const lastRound = t.last_round || 0;
           const totalRounds = t.total_rounds || 1;
           const stage = getStage(lastRound, totalRounds);
           const name = t.tournament_name || 'Tournament #' + (t.tournament_index || '?');
           const prizes = t.computed_prizes || [];
+          const sprite = getSpriteSheet(t.tournament_index || i);
 
           return `
             <div class="reward-card">
-              <div class="stage-icon" style="background-position: ${stagePosition(stage)} 0"></div>
+              <div class="stage-icon" style="background-image: url('${sprite}'); background-position: ${stagePosition(stage)} 0"></div>
               <div class="tournament-name">${escHtml(name)}</div>
               <div class="rounds-label">You won ${lastRound} round${lastRound !== 1 ? 's' : ''}</div>
               ${stage === 0 ? '' : `<div class="prizes-list">
