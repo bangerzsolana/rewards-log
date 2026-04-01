@@ -12,7 +12,7 @@ const TOKEN_MAP = {
   1880961862: { mint: "SENDdRQtYMWaQrBroBrJ2Q53fgVuq95CV9UPGEvpCxa", symbol: "SEND", decimals: 6 },
   2161872254: { mint: "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m", symbol: "MPLX", decimals: 6 },
   646306111:  { mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", symbol: "USDC", decimals: 6 },
-  2103134759: { mint: "5UUH9RTDiSpq6HKS6bp4NdU9PNJpXRXuiw6ShBTBhgH2", symbol: "TROLL", decimals: 9 },
+  2103134759: { mint: "5UUH9RTDiSpq6HKS6bp4NdU9PNJpXRXuiw6ShBTBhgH2", symbol: "TROLL", decimals: 6 },
 };
 
 const roundsCache = {};
