@@ -290,30 +290,12 @@
 
     /* ── Battle log ─────────────────────────── */
 
-    .battle-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 20px 24px 16px;
-    }
-    .battle-header-icon { width: 24px; height: 24px; }
-    .battle-header-title {
-      font-family: 'LuckiestGuy', sans-serif;
-      font-size: 24px;
-      color: var(--black-border);
-      line-height: 1.15;
-    }
-
-    .battle-divider {
-      height: 2px;
-      background: var(--black-border);
-    }
-
     .tourn-selector {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 20px;
+      border-bottom: 2px solid var(--black-border);
     }
     .tourn-name {
       font-family: 'LuckiestGuy', sans-serif;
@@ -593,39 +575,75 @@
     }
 
     .mini-card {
-      width: 76px;
+      width: 90px;
       flex-shrink: 0;
-      border-radius: 8px;
+      border-radius: calc(var(--radius) * 0.7);
       overflow: hidden;
       border: var(--border-width) solid var(--black-border);
+      display: flex;
+      flex-direction: column;
+    }
+    .mini-card-media {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      overflow: hidden;
+    }
+    .mini-card-label {
+      position: absolute;
+      top: 2px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      z-index: 3;
+      font-family: 'Inter', sans-serif;
+      font-size: 8px;
+      font-weight: 800;
+      color: #000;
+      background: #fff;
+      border-radius: 50px;
+      border: var(--border-width) solid var(--black-border);
+      padding: 1px 5px;
+      width: fit-content;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
     .mini-card-img {
-      width: 100%;
-      aspect-ratio: 1;
+      position: absolute;
+      top: -4px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      width: calc(100% - 16px);
+      height: calc(100% - 16px);
       object-fit: cover;
-      display: block;
+      border-radius: 50%;
+      z-index: 2;
     }
-    .mini-card-placeholder {
-      width: 100%;
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Inter', sans-serif;
-      font-size: 9px;
-      font-weight: 800;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .mini-card-decoration {
+      position: absolute;
+      top: -4px;
+      left: -100%;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      width: 300%;
+      height: 200%;
+      z-index: 1;
+      opacity: 0.15;
     }
     .mini-card-stats {
       background: #fff;
-      padding: 4px 0;
+      padding: 5px 0;
       text-align: center;
       font-family: 'LuckiestGuy', sans-serif;
       font-size: 12px;
       color: var(--black-border);
       border-top: var(--border-width) solid var(--black-border);
+      margin-top: -14px;
+      z-index: 2;
+      position: relative;
     }
 
     .vs-badge {
@@ -660,8 +678,6 @@
     }
 
     @media (max-width: 768px) {
-      .battle-header { padding: 14px 16px 12px; }
-      .battle-header-title { font-size: 20px; }
       .tourn-selector { padding: 10px 16px; }
       .tourn-name { font-size: 17px; }
       .battle-table thead th { padding: 10px 14px; }
@@ -875,11 +891,6 @@
       </div>
 
       <div id="battleTab" style="display:none">
-        <div class="battle-header">
-          <img src="/gib-assets/battle_swords.svg" class="battle-header-icon" alt="" />
-          <span class="battle-header-title">MY BATTLE LOG</span>
-        </div>
-        <div class="battle-divider"></div>
         <div class="tourn-selector" id="tournSelector">
           <button class="nav-btn" onclick="prevTournament()">
             <img src="/gib-assets/carousel_arrow_left.svg" class="nav-arrow" alt="Previous" />
@@ -1483,8 +1494,12 @@
     function renderMiniCard(card) {
       const color = CARD_COLORS[card.meme] || '#888';
       const powerVal = typeof card.power === 'number' ? '+' + (Math.round(card.power * 100) / 100) : '';
-      return `<div class="mini-card">
-        <div class="mini-card-placeholder" style="background:${color}">${escHtml(card.meme)}</div>
+      const imgSrc = `/assets/card-images/${card.meme}.png`;
+      return `<div class="mini-card" style="background-color:${color}">
+        <div class="mini-card-media">
+          <div class="mini-card-label">${escHtml(card.meme)}</div>
+          <img class="mini-card-img" src="${imgSrc}" alt="${escHtml(card.meme)}" onerror="this.style.display='none'" />
+        </div>
         <div class="mini-card-stats">${powerVal}</div>
       </div>`;
     }
@@ -1504,7 +1519,7 @@
               ${escHtml(my.username)}
             </div>
             <div class="deck-power">
-              <span class="power-value">+${my.deckPower}</span>
+              <span class="power-value">${my.won ? '+' : ''}${my.deckPower}</span>
               <span class="power-label">POWER</span>
             </div>
           </div>
@@ -1521,7 +1536,7 @@
               ${escHtml(opp.username)}
             </div>
             <div class="deck-power deck-power-right">
-              <span class="power-value">+${opp.deckPower}</span>
+              <span class="power-value">${opp.won ? '+' : ''}${opp.deckPower}</span>
               <span class="power-label">POWER</span>
             </div>
           </div>
