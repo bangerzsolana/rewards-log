@@ -291,33 +291,73 @@
     /* ── Battle log ─────────────────────────── */
 
     .tourn-selector {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 20px;
+      padding: 0;
       border-bottom: 2px solid var(--black-border);
+      overflow: hidden;
+      min-height: 80px;
     }
+    .tourn-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      z-index: 0;
+    }
+    .tourn-asset {
+      position: relative;
+      z-index: 1;
+      height: 70px;
+      width: auto;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .tourn-asset-left { margin-left: 12px; }
+    .tourn-asset-right { margin-right: 12px; }
     .tourn-name {
+      position: relative;
+      z-index: 2;
       font-family: 'LuckiestGuy', sans-serif;
-      font-size: 20px;
+      font-size: 26px;
+      color: #fff;
+      letter-spacing: 0.05em;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.25);
+      text-align: center;
+      flex: 1;
+      white-space: nowrap;
+    }
+    .tourn-name-plain {
       color: var(--black-border);
-      letter-spacing: 0.03em;
+      text-shadow: none;
+      font-size: 20px;
     }
     .nav-btn {
+      position: relative;
+      z-index: 3;
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      border: var(--border-width) solid var(--black-border);
-      background: rgba(255, 255, 255, 0.5);
+      border: 2px solid var(--black-border);
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
       padding: 0;
+      box-shadow: 4.5px 3px 0 var(--black-border);
+      transition: transform 0.1s, box-shadow 0.1s;
     }
-    .nav-btn:active { background: rgba(255, 255, 255, 0.8); }
-    .nav-arrow { width: 14px; height: 14px; display: block; }
+    .nav-btn:active {
+      transform: translate(3px, 2px);
+      box-shadow: none;
+    }
+    .nav-btn-left { margin-left: 16px; }
+    .nav-btn-right { margin-right: 16px; }
+    .nav-arrow { width: 13px; height: 13px; display: block; }
     .nav-arrow-right { transform: scaleX(-1); }
 
     .table-scroll {
@@ -678,8 +718,15 @@
     }
 
     @media (max-width: 768px) {
-      .tourn-selector { padding: 10px 16px; }
-      .tourn-name { font-size: 17px; }
+      .tourn-selector { min-height: 60px; }
+      .tourn-name { font-size: 16px; }
+      .tourn-asset { height: 50px; }
+      .tourn-asset-left { margin-left: 4px; }
+      .tourn-asset-right { margin-right: 4px; }
+      .nav-btn { width: 30px; height: 30px; }
+      .nav-btn-left { margin-left: 8px; }
+      .nav-btn-right { margin-right: 8px; }
+      .nav-arrow { width: 11px; height: 11px; }
       .battle-table thead th { padding: 10px 14px; }
       .battle-table td { padding: 12px 14px; font-size: 13px; }
       .battle-table .round-td { font-size: 14px; }
@@ -892,15 +939,17 @@
 
       <div id="battleTab" style="display:none">
         <div class="tourn-selector" id="tournSelector">
-          <button class="nav-btn" onclick="prevTournament()">
+          <div class="tourn-bg" id="tournBg"></div>
+          <button class="nav-btn nav-btn-left" onclick="prevTournament()">
             <img src="/gib-assets/carousel_arrow_left.svg" class="nav-arrow" alt="Previous" />
           </button>
+          <img class="tourn-asset tourn-asset-left" id="tournAssetLeft" alt="" />
           <span class="tourn-name" id="tournName"></span>
-          <button class="nav-btn" onclick="nextTournament()">
+          <img class="tourn-asset tourn-asset-right" id="tournAssetRight" alt="" />
+          <button class="nav-btn nav-btn-right" onclick="nextTournament()">
             <img src="/gib-assets/carousel_arrow_left.svg" class="nav-arrow nav-arrow-right" alt="Next" />
           </button>
         </div>
-        <div class="battle-divider"></div>
         <div class="table-scroll">
           <table class="battle-table">
             <thead>
@@ -1352,6 +1401,12 @@
       },
       {
         id:'bonk', name:'BONK', color:'#FFD84D',
+        banner: {
+          desktopBg: '/assets/tournament-banners/bonk/desktop-bg.png',
+          mobileBg: '/assets/tournament-banners/bonk/mobile-bg.png',
+          left: '/assets/tournament-banners/bonk/left.png',
+          right: '/assets/tournament-banners/bonk/right.png',
+        },
         rounds:[
           { roundNumber:1, date:'May 28, 2025', prize:'10 Flies', battles:[
             mkBattle('Maritest',['LETSBONK','SIGMA','BABYDOGE'],295,'Funkydog',['CWIF','NPC','HONEY'],218,true),
@@ -1463,8 +1518,32 @@
 
     function renderBattleTable() {
       const t = BATTLE_TOURNAMENTS[activeTournIdx];
-      document.getElementById('tournName').textContent = t.name;
-      document.getElementById('tournSelector').style.background = t.color;
+      const nameEl = document.getElementById('tournName');
+      const selectorEl = document.getElementById('tournSelector');
+      const bgEl = document.getElementById('tournBg');
+      const leftAsset = document.getElementById('tournAssetLeft');
+      const rightAsset = document.getElementById('tournAssetRight');
+
+      nameEl.textContent = t.name + ' TOURNAMENT';
+
+      if (t.banner) {
+        const isMobile = window.innerWidth <= 768;
+        bgEl.style.backgroundImage = `url('${isMobile ? t.banner.mobileBg : t.banner.desktopBg}')`;
+        bgEl.style.display = '';
+        selectorEl.style.background = 'none';
+        leftAsset.src = t.banner.left;
+        leftAsset.style.display = '';
+        rightAsset.src = t.banner.right;
+        rightAsset.style.display = '';
+        nameEl.classList.remove('tourn-name-plain');
+      } else {
+        bgEl.style.display = 'none';
+        bgEl.style.backgroundImage = '';
+        selectorEl.style.background = t.color;
+        leftAsset.style.display = 'none';
+        rightAsset.style.display = 'none';
+        nameEl.classList.add('tourn-name-plain');
+      }
 
       const rows = getActiveBattles();
       const tbody = document.getElementById('battleTableBody');
