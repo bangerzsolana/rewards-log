@@ -299,7 +299,7 @@
       border-top: 2px solid var(--black-border);
       border-bottom: 2px solid var(--black-border);
       overflow: hidden;
-      min-height: 80px;
+      height: 140.5px;
     }
     .tourn-bg {
       position: absolute;
@@ -311,7 +311,7 @@
     .tourn-asset {
       position: relative;
       z-index: 1;
-      height: 70px;
+      height: 100px;
       width: auto;
       object-fit: contain;
       flex-shrink: 0;
@@ -322,7 +322,7 @@
       position: relative;
       z-index: 2;
       font-family: 'LuckiestGuy', sans-serif;
-      font-size: 26px;
+      font-size: 24px;
       color: #fff;
       letter-spacing: 0.05em;
       -webkit-text-stroke: 2px #101010;
@@ -738,9 +738,9 @@
     }
 
     @media (max-width: 768px) {
-      .tourn-selector { min-height: 60px; }
+      .tourn-selector { height: 120px; }
       .tourn-name { font-size: 16px; }
-      .tourn-asset { height: 50px; }
+      .tourn-asset { height: 85px; }
       .tourn-asset-left { margin-left: 4px; }
       .tourn-asset-right { margin-right: 4px; }
       .nav-btn { width: 30px; height: 30px; }
@@ -1335,7 +1335,13 @@
 
     const BATTLE_TOURNAMENTS = [
       {
-        id:'send', name:'SEND', color:'#A8D8F0',
+        id:'seeker', name:'SEEKER', color:'#A8D8F0',
+        banner: {
+          desktopBg: '/assets/tournament-banners/seeker/desktop-bg.png',
+          mobileBg: '/assets/tournament-banners/seeker/mobile-bg.png',
+          left: '/assets/tournament-banners/seeker/left.png',
+          right: '/assets/tournament-banners/seeker/right.png',
+        },
         rounds:[
           { roundNumber:1, date:'May 19, 2025', prize:'10 Flies', battles:[
             mkBattle('Maritest',['LABUBU','RENDER','AIXBT'],405,'Zoltan',['BONK','PUMP','ZEREBRO'],300,true),
@@ -1416,7 +1422,13 @@
         ],
       },
       {
-        id:'metaplex', name:'METAPLEX', color:'#7DDFB8',
+        id:'gibbit', name:'GIBBIT', color:'#7DDFB8',
+        banner: {
+          desktopBg: '/assets/tournament-banners/gibbit/desktop-bg.png',
+          mobileBg: '/assets/tournament-banners/gibbit/mobile-bg.png',
+          left: '/assets/tournament-banners/gibbit/left.png',
+          right: '/assets/tournament-banners/gibbit/right.png',
+        },
         rounds:[
           { roundNumber:1, date:'June 1, 2025', prize:'10 Flies', battles:[
             mkBattle('Maritest',['MELANIA','SILLY','VINE'],279,'Cybervex',['PUPS','ZEREBRO','SIGMA'],264,false),
@@ -1424,7 +1436,13 @@
         ],
       },
       {
-        id:'launch', name:'LAUNCH', color:'#b29bf4',
+        id:'cherry', name:'CHERRY', color:'#b29bf4',
+        banner: {
+          desktopBg: '/assets/tournament-banners/cherry/desktop-bg.png',
+          mobileBg: '/assets/tournament-banners/cherry/mobile-bg.png',
+          left: '/assets/tournament-banners/cherry/left.png',
+          right: '/assets/tournament-banners/cherry/right.png',
+        },
         rounds:[
           { roundNumber:1, date:'May 18, 2025', prize:'10 Flies', battles:[
             mkBattle('Maritest',['RENDER','VIRTUAL','LABUBU'],425,'Axiom',['BONK','PUMP','SILLY'],258,true),
@@ -1455,7 +1473,13 @@
         ],
       },
       {
-        id:'chonky', name:'CHONKY', color:'#F2877A',
+        id:'sol-incinerator', name:'SOL-INCINERATOR', color:'#F2877A',
+        banner: {
+          desktopBg: '/assets/tournament-banners/sol-incinerator/desktop-bg.png',
+          mobileBg: '/assets/tournament-banners/sol-incinerator/mobile-bg.png',
+          left: '/assets/tournament-banners/sol-incinerator/left.png',
+          right: '/assets/tournament-banners/sol-incinerator/right.png',
+        },
         rounds:[
           { roundNumber:1, date:'June 6, 2025', prize:'10 Flies', battles:[
             mkBattle('Maritest',['CWIF','HONEY','ROCKY'],257,'Warpzone',['MON','PUMP','ZEREBRO'],271,false),
