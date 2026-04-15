@@ -470,11 +470,11 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 580px;
+      max-width: 750px;
       border-radius: var(--radius);
       border: var(--border-width) solid var(--black-border);
-      padding: 16px;
-      gap: 12px;
+      padding: 20px;
+      gap: 14px;
       max-height: 90vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -487,7 +487,7 @@
     }
     .carousel-tname {
       font-family: 'LuckiestGuy', sans-serif;
-      font-size: 22px;
+      font-size: 32px;
       color: var(--black-border);
       white-space: nowrap;
       overflow: hidden;
@@ -509,11 +509,11 @@
       flex-shrink: 0;
       font-family: 'Inter', sans-serif;
       line-height: 1;
-      box-shadow: 4.5px 3px 0 var(--black-border);
+      box-shadow: 3px 2px 0 var(--black-border);
       transition: transform 0.1s, box-shadow 0.1s;
     }
     .carousel-close:active {
-      transform: translate(3px, 2px);
+      transform: translate(2px, 1.5px);
       box-shadow: none;
     }
 
@@ -523,7 +523,7 @@
       display: flex;
       flex-direction: column;
       border: var(--border-width) solid var(--black-border);
-      border-radius: 4px;
+      border-radius: var(--radius);
       overflow: hidden;
       background: #fff;
     }
@@ -546,20 +546,19 @@
 
     .battle-arena {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       gap: 0;
-      padding: 12px;
+      padding: 16px;
       background: #fff;
-      min-height: 200px;
     }
     .arena-side {
       flex: 1;
       min-width: 0;
       border-radius: var(--radius);
-      padding: 10px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
     .arena-winner { background: #D0F8D2; }
     .arena-loser { background: #FFD8D8; }
@@ -642,11 +641,11 @@
       cursor: pointer;
       flex-shrink: 0;
       padding: 0;
-      box-shadow: 4.5px 3px 0 var(--black-border);
+      box-shadow: 3px 2px 0 var(--black-border);
       transition: transform 0.1s, box-shadow 0.1s;
     }
     .carousel-btn:active {
-      transform: translate(3px, 2px);
+      transform: translate(2px, 1.5px);
       box-shadow: none;
     }
     .carousel-btn img { width: 13px; height: 13px; display: block; }
@@ -666,7 +665,7 @@
     /* ── Mini cards (used in carousel) ─────── */
 
     .mini-card {
-      width: 90px;
+      width: 100px;
       flex-shrink: 0;
       border-radius: calc(var(--radius) * 0.7);
       overflow: hidden;
@@ -759,8 +758,8 @@
       .battle-table .round-td { font-size: 14px; }
 
       .sheet { padding: 12px; }
-      .carousel-panel { padding: 12px; gap: 10px; }
-      .carousel-tname { font-size: 18px; }
+      .carousel-panel { padding: 14px; gap: 10px; }
+      .carousel-tname { font-size: 22px; }
 
       .battle-arena {
         flex-direction: column;
@@ -1614,26 +1613,20 @@
       const opp = battle.opponent;
       const myColor = userColor(my.username);
       const oppColor = userColor(opp.username);
-      const isFlies = row.roundNumber === 1;
 
-      const statusIcon = isFlies ? '/gib-assets/fly.svg' : '/gib-assets/fly.svg';
-      const statusClass = my.won ? 'status-win' : 'status-loss';
-      const statusLabel = my.won
-        ? `<img src="${statusIcon}" alt="" /> <span class="fontoffset">PRIZE ${escHtml(row.prize)}</span>`
-        : `<span class="fontoffset">ELIMINATED</span>`;
-
-      const roundBar = `<div class="battle-status-bar status-round">
-        <img src="/gib-assets/battle_swords.svg" alt="" />
-        <span class="fontoffset">Round ${row.roundNumber}</span>
-        ${my.won ? `<span style="color:#01b22e;display:inline-flex;align-items:center;gap:4px;margin-left:8px;background:#D0F8D2;border-radius:50px;padding:2px 8px">
-          <img src="${statusIcon}" alt="" style="width:16px;height:16px" />
-          <span class="fontoffset" style="font-size:12px">${escHtml(row.prize)}</span>
-        </span>` : ''}
-      </div>`;
+      const statusBar = my.won
+        ? `<div class="battle-status-bar status-win">
+            <img src="/gib-assets/fly.svg" alt="" />
+            <span class="fontoffset">PRIZE ${escHtml(row.prize)}</span>
+            <span style="margin-left:auto" class="fontoffset">Round ${row.roundNumber}</span>
+          </div>`
+        : `<div class="battle-status-bar status-loss">
+            <span class="fontoffset">Lost</span>
+            <span style="margin-left:auto" class="fontoffset">Round ${row.roundNumber}</span>
+          </div>`;
 
       return `<div class="battle-frame">
-        ${my.won ? '' : `<div class="battle-status-bar ${statusClass}">${statusLabel}</div>`}
-        ${roundBar}
+        ${statusBar}
         <div class="battle-arena">
           <div class="arena-side ${my.won ? 'arena-winner' : 'arena-loser'}">
             <div class="arena-cards">${my.cards.map(renderMiniCard).join('')}</div>
@@ -1667,8 +1660,14 @@
       const row = currentBattleRows[carouselPosition];
       if (!row) return;
       document.getElementById('carouselBattle').innerHTML = renderBattleCarousel(row);
-      document.getElementById('carouselCounter').textContent =
-        (carouselPosition + 1) + ' of ' + currentBattleRows.length;
+      const nav = document.querySelector('.carousel-nav');
+      if (currentBattleRows.length <= 1) {
+        nav.style.display = 'none';
+      } else {
+        nav.style.display = '';
+        document.getElementById('carouselCounter').textContent =
+          (carouselPosition + 1) + ' of ' + currentBattleRows.length;
+      }
     }
 
     function openBattleSheet(idx) {
