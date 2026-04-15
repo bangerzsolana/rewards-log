@@ -517,6 +517,37 @@
       box-shadow: none;
     }
 
+    /* ── Cards / Charts toggle ────────────── */
+
+    .carousel-toggle {
+      display: flex;
+      border: 2px solid var(--black-border);
+      border-radius: 50px;
+      overflow: hidden;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    .toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #999;
+      border-radius: 50px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .toggle-btn.toggle-active {
+      background: var(--black-border);
+      color: #fff;
+    }
+    .toggle-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
     /* ── GibBattle inside carousel ─────────── */
 
     .battle-frame {
@@ -527,22 +558,44 @@
       overflow: hidden;
       background: #fff;
     }
+    .battle-status-row {
+      display: flex;
+      border-bottom: var(--border-width) solid var(--black-border);
+    }
     .battle-status-bar {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      height: 38px;
-      padding: 0 12px;
+      height: 42px;
+      padding: 0 16px;
       font-family: 'LuckiestGuy', sans-serif;
-      font-size: 14px;
-      border-bottom: var(--border-width) solid var(--black-border);
+      font-size: 16px;
     }
     .battle-status-bar img { width: 20px; height: 20px; }
+    .battle-status-result {
+      flex: 1.1;
+    }
+    .battle-status-round {
+      flex: 1;
+      gap: 10px;
+    }
     .battle-status-bar.status-win { background: #D0F8D2; color: #01b22e; }
     .battle-status-bar.status-loss { background: #FFD8D8; color: #b91c1c; }
-    .battle-status-bar.status-round { background: #D0F8D2; }
+    .battle-status-round { background: #D0F8D2; color: #01b22e; }
     .battle-status-bar .fontoffset { transform: translateY(2px); }
+    .status-flies {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(1, 178, 46, 0.15);
+      color: #01b22e;
+      font-size: 12px;
+      border-radius: 50px;
+      padding: 3px 10px 1px;
+      font-family: 'LuckiestGuy', sans-serif;
+    }
+    .status-flies img { width: 14px; height: 14px; }
 
     .battle-arena {
       display: flex;
@@ -725,15 +778,111 @@
     }
     .mini-card-stats {
       background: #fff;
-      padding: 5px 0;
-      text-align: center;
+      padding: 5px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
       font-family: 'LuckiestGuy', sans-serif;
       font-size: 12px;
-      color: var(--black-border);
+      color: #01b22e;
       border-top: var(--border-width) solid var(--black-border);
       margin-top: -14px;
       z-index: 2;
       position: relative;
+    }
+    .mini-card-stats svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    /* ── Chart view ─────────────────────────── */
+
+    .chart-view {
+      border: var(--border-width) solid var(--black-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+    }
+    .chart-period-toggle {
+      display: flex;
+      gap: 0;
+      padding: 12px 16px 0;
+    }
+    .period-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border: none;
+      cursor: pointer;
+      background: #e0e0e0;
+      color: #666;
+      border-radius: 50px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .period-btn.period-active {
+      background: var(--black-border);
+      color: #fff;
+    }
+    .chart-area {
+      position: relative;
+      padding: 16px;
+      min-height: 220px;
+    }
+    .chart-canvas-wrap {
+      width: 100%;
+      height: 200px;
+      position: relative;
+    }
+    .chart-canvas-wrap canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .chart-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 8px;
+      transform: translateX(-50%);
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--black-border) 0px,
+        var(--black-border) 6px,
+        #fff 6px,
+        #fff 12px
+      );
+    }
+    .chart-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(0,0,0,0.75);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: #fff;
+    }
+    .chart-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .chart-legend-name {
+      flex: 1;
+    }
+    .chart-legend-val {
+      font-family: 'LuckiestGuy', sans-serif;
+      font-size: 14px;
+      transform: translateY(1px);
     }
 
     .battle-empty {
@@ -759,7 +908,10 @@
 
       .sheet { padding: 12px; }
       .carousel-panel { padding: 14px; gap: 10px; }
+      .carousel-top { flex-wrap: wrap; }
       .carousel-tname { font-size: 22px; }
+      .toggle-btn { font-size: 11px; padding: 5px 12px; }
+      .toggle-btn svg { width: 14px; height: 14px; }
 
       .battle-arena {
         flex-direction: column;
@@ -785,6 +937,9 @@
       }
       .arena-cards { width: 100%; }
       .mini-card { flex: 1; width: auto; min-width: 0; }
+      .battle-status-bar { font-size: 13px; height: 36px; }
+      .chart-canvas-wrap { height: 160px; }
+      .chart-legend { font-size: 11px; padding: 6px 10px; bottom: 16px; right: 16px; }
     }
 
     /* ── Empty / error / loading ───────────── */
@@ -966,9 +1121,19 @@
         <div class="carousel-panel" id="carouselPanel">
           <div class="carousel-top">
             <div class="carousel-tname" id="carouselTname"></div>
-            <button class="carousel-close" onclick="closeBattleSheet()">&times;</button>
+            <div class="carousel-toggle">
+              <button class="toggle-btn toggle-active" id="toggleCards" onclick="setCarouselView('cards')">
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="18" rx="2"/><rect x="13" y="3" width="8" height="18" rx="2"/></svg>
+                Cards
+              </button>
+              <button class="toggle-btn" id="toggleCharts" onclick="setCarouselView('charts')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/></svg>
+                Charts
+              </button>
+            </div>
           </div>
           <div id="carouselBattle"></div>
+          <div id="carouselCharts" style="display:none"></div>
           <div class="carousel-nav">
             <button class="carousel-btn" onclick="prevCarousel()">
               <img src="/gib-assets/carousel_arrow_left.svg" alt="Previous" />
@@ -1596,14 +1761,15 @@
 
     function renderMiniCard(card) {
       const color = CARD_COLORS[card.meme] || '#888';
-      const powerVal = typeof card.power === 'number' ? '+' + (Math.round(card.power * 100) / 100) : '';
+      const powerVal = typeof card.power === 'number' ? '+' + (Math.round(card.power * 1000) / 1000) : '';
       const imgSrc = `/assets/card-images/${card.meme}.png`;
+      const chartIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="#01b22e" stroke-width="2.5" stroke-linecap="round"><polyline points="3 17 9 11 13 15 21 7"/></svg>`;
       return `<div class="mini-card" style="background-color:${color}">
         <div class="mini-card-media">
           <div class="mini-card-label">${escHtml(card.meme)}</div>
           <img class="mini-card-img" src="${imgSrc}" alt="${escHtml(card.meme)}" onerror="this.style.display='none'" />
         </div>
-        <div class="mini-card-stats">${powerVal}</div>
+        <div class="mini-card-stats">${powerVal} ${chartIcon}</div>
       </div>`;
     }
 
@@ -1614,16 +1780,24 @@
       const myColor = userColor(my.username);
       const oppColor = userColor(opp.username);
 
-      const statusBar = my.won
-        ? `<div class="battle-status-bar status-win">
-            <img src="/gib-assets/fly.svg" alt="" />
-            <span class="fontoffset">PRIZE ${escHtml(row.prize)}</span>
-            <span style="margin-left:auto" class="fontoffset">Round ${row.roundNumber}</span>
-          </div>`
-        : `<div class="battle-status-bar status-loss">
-            <span class="fontoffset">Lost</span>
-            <span style="margin-left:auto" class="fontoffset">Round ${row.roundNumber}</span>
-          </div>`;
+      const isFlies = row.roundNumber === 1;
+      const fliesPill = isFlies
+        ? `<span class="status-flies"><img src="/gib-assets/fly.svg" alt="" /> <span class="fontoffset">10 FLIES</span></span>`
+        : '';
+
+      const resultClass = my.won ? 'status-win' : 'status-loss';
+      const resultText = my.won ? 'WON' : 'LOST';
+      const prizeNote = my.won ? ` — ${escHtml(row.prize)}` : '';
+
+      const statusBar = `<div class="battle-status-row">
+        <div class="battle-status-bar battle-status-result ${resultClass}">
+          <span class="fontoffset">${resultText}${prizeNote}</span>
+        </div>
+        <div class="battle-status-bar battle-status-round">
+          <span class="fontoffset">⚔ ROUND ${row.roundNumber}</span>
+          ${fliesPill}
+        </div>
+      </div>`;
 
       return `<div class="battle-frame">
         ${statusBar}
@@ -1635,7 +1809,7 @@
                 <div class="arena-user-avatar" style="background:${myColor}"></div>
                 ${escHtml(my.username)}
               </div>
-              <span class="arena-power">Power ${my.deckPower}</span>
+              <span class="arena-power">POWER ${my.deckPower}</span>
             </div>
           </div>
           <div class="arena-vs">VS.</div>
@@ -1646,7 +1820,7 @@
                 <div class="arena-user-avatar" style="background:${oppColor}"></div>
                 ${escHtml(opp.username)}
               </div>
-              <span class="arena-power">Power ${opp.deckPower}</span>
+              <span class="arena-power">POWER ${opp.deckPower}</span>
             </div>
           </div>
         </div>
@@ -1655,18 +1829,136 @@
 
     let currentBattleRows = [];
     let carouselPosition = 0;
+    let carouselView = 'cards';
+
+    function setCarouselView(view) {
+      carouselView = view;
+      document.getElementById('toggleCards').classList.toggle('toggle-active', view === 'cards');
+      document.getElementById('toggleCharts').classList.toggle('toggle-active', view === 'charts');
+      document.getElementById('carouselBattle').style.display = view === 'cards' ? '' : 'none';
+      document.getElementById('carouselCharts').style.display = view === 'charts' ? '' : 'none';
+      if (view === 'charts') renderChartView();
+    }
+
+    function renderChartView() {
+      const row = currentBattleRows[carouselPosition];
+      if (!row) return;
+      const battle = row.battle;
+      const my = battle.my;
+      const opp = battle.opponent;
+      const myColor = userColor(my.username);
+      const oppColor = userColor(opp.username);
+
+      const isFlies = row.roundNumber === 1;
+      const fliesPill = isFlies
+        ? `<span class="status-flies"><img src="/gib-assets/fly.svg" alt="" /> <span class="fontoffset">10 FLIES</span></span>`
+        : '';
+      const resultClass = my.won ? 'status-win' : 'status-loss';
+      const resultText = my.won ? 'WON' : 'LOST';
+
+      const statusBar = `<div class="battle-status-row">
+        <div class="battle-status-bar battle-status-result ${resultClass}">
+          <span class="fontoffset">${resultText}</span>
+        </div>
+        <div class="battle-status-bar battle-status-round">
+          <span class="fontoffset">⚔ ROUND ${row.roundNumber}</span>
+          ${fliesPill}
+        </div>
+      </div>`;
+
+      document.getElementById('carouselCharts').innerHTML = `<div class="chart-view">
+        ${statusBar}
+        <div class="chart-period-toggle">
+          <button class="period-btn" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('period-active'));this.classList.add('period-active')">1D</button>
+          <button class="period-btn" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('period-active'));this.classList.add('period-active')">3D</button>
+          <button class="period-btn period-active" onclick="this.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('period-active'));this.classList.add('period-active')">7D</button>
+        </div>
+        <div class="chart-area">
+          <div class="chart-canvas-wrap">
+            <canvas id="chartCanvas"></canvas>
+            <div class="chart-divider"></div>
+          </div>
+          <div class="chart-legend">
+            <div class="chart-legend-row">
+              <div class="chart-legend-dot" style="background:#ff47a3"></div>
+              <span class="chart-legend-name">${escHtml(opp.username)}</span>
+              <span class="chart-legend-val">${opp.deckPower}</span>
+            </div>
+            <div class="chart-legend-row">
+              <div class="chart-legend-dot" style="background:#a78bfa"></div>
+              <span class="chart-legend-name">${escHtml(my.username)}</span>
+              <span class="chart-legend-val">${my.deckPower}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+      drawPowerChart(my, opp);
+    }
+
+    function drawPowerChart(my, opp) {
+      const canvas = document.getElementById('chartCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      const w = rect.width;
+      const h = rect.height;
+
+      const myPow = parseFloat(my.deckPower) || 1;
+      const oppPow = parseFloat(opp.deckPower) || 1;
+      const maxPow = Math.max(myPow, oppPow) * 1.3;
+      const pts = 40;
+
+      function genLine(basePow) {
+        const line = [];
+        let val = basePow;
+        for (let i = 0; i <= pts; i++) {
+          val += (Math.random() - 0.48) * basePow * 0.12;
+          val = Math.max(basePow * 0.4, Math.min(maxPow, val));
+          if (i === pts) val = basePow;
+          line.push(val);
+        }
+        return line;
+      }
+
+      const myLine = genLine(myPow);
+      const oppLine = genLine(oppPow);
+
+      function drawLine(line, color) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        for (let i = 0; i <= pts; i++) {
+          const x = (i / pts) * w;
+          const y = h - (line[i] / maxPow) * (h - 20) - 10;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      ctx.clearRect(0, 0, w, h);
+      drawLine(myLine, '#a78bfa');
+      drawLine(oppLine, '#ff47a3');
+    }
 
     function renderCarouselAt() {
       const row = currentBattleRows[carouselPosition];
       if (!row) return;
       document.getElementById('carouselBattle').innerHTML = renderBattleCarousel(row);
+      if (carouselView === 'charts') renderChartView();
       const nav = document.querySelector('.carousel-nav');
       if (currentBattleRows.length <= 1) {
         nav.style.display = 'none';
       } else {
         nav.style.display = '';
         document.getElementById('carouselCounter').textContent =
-          (carouselPosition + 1) + ' of ' + currentBattleRows.length;
+          (carouselPosition + 1) + ' OF ' + currentBattleRows.length;
       }
     }
 
@@ -1674,10 +1966,16 @@
       currentBattleRows = getActiveBattles();
       if (!currentBattleRows.length) return;
       carouselPosition = Math.min(idx, currentBattleRows.length - 1);
+      carouselView = 'cards';
 
       const t = BATTLE_TOURNAMENTS[activeTournIdx];
       document.getElementById('carouselTname').textContent = t.name + ' TOURNAMENT';
       document.getElementById('carouselPanel').style.background = t.color;
+
+      document.getElementById('toggleCards').classList.add('toggle-active');
+      document.getElementById('toggleCharts').classList.remove('toggle-active');
+      document.getElementById('carouselBattle').style.display = '';
+      document.getElementById('carouselCharts').style.display = 'none';
 
       renderCarouselAt();
       document.getElementById('battleSheet').style.display = '';
