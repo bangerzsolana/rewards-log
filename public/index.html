@@ -66,6 +66,13 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      min-height: calc(100vh - 64px);
+    }
+
+    #battleTab {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     /* ── Header ───────────────────────────── */
@@ -890,6 +897,7 @@
       .reward-card .stage-icon { width: 90px; height: 90px; }
       .reward-card .tournament-name { font-size: 14px; }
       body { padding: 24px 12px 16px; }
+      .rewards-panel { min-height: calc(100vh - 40px); }
       .page-header { padding: 16px 16px 12px; }
       .page-title { font-size: 22px; }
       .tab { font-size: 13px; padding: 7px 16px; }
@@ -1006,7 +1014,7 @@
       document.getElementById('tabRewards').className = tab === 'rewards' ? 'tab active' : 'tab';
       document.getElementById('tabBattle').className = tab === 'battle' ? 'tab active' : 'tab';
       document.getElementById('rewardsTab').style.display = tab === 'rewards' ? '' : 'none';
-      document.getElementById('battleTab').style.display = tab === 'battle' ? '' : 'none';
+      document.getElementById('battleTab').style.display = tab === 'battle' ? 'flex' : 'none';
       document.getElementById('pageTitle').textContent = tab === 'rewards' ? 'REWARDS LOG' : 'BATTLE LOG';
       if (tab === 'battle' && !battleInitialized) {
         battleInitialized = true;
