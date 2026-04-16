@@ -438,8 +438,6 @@
 
     .deck-mini-card-img {
       flex: 1;
-      background-size: cover;
-      background-position: center top;
       min-height: 0;
     }
 
@@ -1522,14 +1520,35 @@
     };
 
     const CARD_COLORS = {
-      BITCOIN:'#f7931a',PNUT:'#8B4513',GME:'#ff0000',ELON:'#1DA1F2',GRASS:'#4CAF50',
-      MOODENG:'#e91e63',LETSBONK:'#FFD84D',RETARDIO:'#9c27b0',MELANIA:'#c62828',
-      CWIF:'#ff9800',LABUBU:'#d2b48c',GRIFFAIN:'#3f51b5',ZEREBRO:'#607d8b',
-      PEPX:'#ff5722',VIRTUAL:'#2196f3',SILLY:'#cddc39',ELIZA:'#9c27b0',
-      PUMP:'#4caf50',PUPS:'#795548',VINE:'#388e3c',BABYDOGE:'#ffd54f',
-      DOG:'#8d6e63',AIXBT:'#0d47a1',SIGMA:'#212121',RENDER:'#00bcd4',
-      BONK:'#FFD84D',LINK:'#2962ff',RAY:'#7c4dff',ORCA:'#00838f',
-      NPC:'#546e7a',ROCKY:'#a1887f',HONEY:'#ffb300',MON:'#43a047',
+      "WIF":"#8993eb","FWOG":"#ffffff","PNUT":"#3a314e","CAKE":"#ffe1ba",
+      "TRUMP":"#313131","Bonk":"#006b58","GSX":"#6b93cd","CHONKY":"#ffffff",
+      "SEND":"#2775f5","ROCKY":"#001dff","SKR":"#89b0c4","W":"#090927",
+      "VINE":"#ebba93","WEN":"#000931","TNSR":"#00273a","ZEREBRO":"#131331",
+      "AMZNX":"#001309","MON":"#583189","GMT":"#f5f5eb","ELIZA":"#000927",
+      "USELESS":"#f5ba62","GRIFFAIN":"#13131d","AIXBT":"#ebebeb","GRASS":"#e1c489",
+      "USDUC":"#d7ba89","METAX":"#00133a","JTO":"#b06bf5","LABUBU":"#ebc489",
+      "MOODENG":"#3ad789","FARTCOIN":"#000000","ORCA":"#eb6275","BIO":"#278993",
+      "LAYER":"#8944c4","MASK":"#f5ebd7","AURA":"#131358","POPCAT":"#9cffff",
+      "PYTH":"#133a58","LUNC":"#441375","PUMP":"#27a631","RETARDIO":"#f5f5eb",
+      "NVDAX":"#62933a","RAY":"#ebd7b0","AAPLX":"#93c4cd","BITCOIN":"#ebc43a",
+      "HOODX":"#75b062","KMNO":"#09091d","VIRTUAL":"#4e6b75","GOOGLX":"#3a3a3a",
+      "CARDS":"#0962b0","MET":"#130931","NPC":"#6244c4","MSTRX":"#ebe1cd",
+      "ELON":"#134493","1INCH":"#4475ba","SPX":"#090913","SNS":"#31316b",
+      "LINK":"#ebebeb","BAT":"#623a89","BAN":"#fff5e1","MPLX":"#1d1358",
+      "BABYDOGE":"#89ff6b","2Z":"#090913","RENDER":"#000927","GME":"#3a9c13",
+      "STNK":"#274e93","NFLXX":"#3a1d13","HDX":"#009ce1","INTCX":"#ffd7ba",
+      "CWIF":"#f5b0b0","ORE":"#3a9cb0","VTIX":"#d7313a","PUPS":"#0093f5",
+      "VX":"#bacdf5","MAX":"#62c4f5","GLDX":"#001d27","UNI":"#d7c49c",
+      "FTT":"#938900","KOX":"#e11d1d","CSCOX":"#c4ebff","SCF":"#000909",
+      "JPMX":"#4ea6eb","PEPX":"#0993e1","SILLY":"#44d758","SAVE":"#ffb000",
+      "PFEX":"#00316b","BRK.BX":"#09cdd7","ORCLX":"#e12727","STEP":"#751344",
+      "CRMX":"#b0ebff","CVXX":"#000000","POWSCHE":"#62897f","MSFTX":"#005858",
+      "MOBILE":"#a69c62","PURPE":"#f5ff00","HNT":"#b0cdf5","YZY":"#003144",
+      "DOG":"#ffebc4","PLTRX":"#c4b0a6","MELANIA":"#f5ebd7","AAVE":"#6231a6",
+      "PLAY":"#62bab0","BMT":"#1d133a","HONEY":"#cd2700","SIGMA":"#d7cdb0",
+      "COINX":"#092744","TSLAX":"#d75831","C98":"#626b75","MCDX":"#b04e31",
+      "LETSBONK":"#eb4400","DRIFT":"#580075",
+      "BONK":"#006b58",
     };
 
     function mkCard(meme) {
@@ -1790,9 +1809,9 @@
         const outcomeText = row.won ? 'WIN' : 'LOSS';
 
         const deckHtml = row.battle.my.cards.map(c => {
-          const imgSrc = `/assets/card-images/${c.meme}.png`;
+          const color = CARD_COLORS[c.meme] || '#888';
           return `<div class="deck-mini-card">
-            <div class="deck-mini-card-img" style="background-image:url('${imgSrc}')"></div>
+            <div class="deck-mini-card-img" style="background:${color}"></div>
             <div class="deck-mini-card-name">${escHtml(c.meme)}</div>
           </div>`;
         }).join('');
