@@ -417,7 +417,46 @@
     }
 
     .battle-table .round-td { font-size: 15px; font-weight: 700; }
-    .battle-table .deck-td { color: #555; font-weight: 600; }
+    .battle-table .deck-td { padding-top: 10px; padding-bottom: 10px; }
+    .battle-table .date-td { color: #888; font-weight: 600; font-size: 13px; }
+
+    .deck-preview {
+      display: flex;
+      gap: 6px;
+    }
+
+    .deck-mini-card {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 2px solid var(--black-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .deck-mini-card-img {
+      flex: 1;
+      background-size: cover;
+      background-position: center top;
+      min-height: 0;
+    }
+
+    .deck-mini-card-name {
+      background: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 7px;
+      font-weight: 800;
+      text-align: center;
+      color: var(--black-border);
+      padding: 1px 2px;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-top: 1.5px solid var(--black-border);
+    }
 
     .outcome-pill {
       display: inline-block;
@@ -902,9 +941,13 @@
       .nav-btn-left { margin-left: 8px; }
       .nav-btn-right { margin-right: 8px; }
       .nav-arrow { width: 11px; height: 11px; }
-      .battle-table thead th { padding: 10px 14px; }
-      .battle-table td { padding: 12px 14px; font-size: 13px; }
+      .battle-table thead th { padding: 10px 10px; }
+      .battle-table td { padding: 10px 10px; font-size: 13px; }
       .battle-table .round-td { font-size: 14px; }
+      .deck-mini-card { width: 36px; height: 36px; border-radius: 6px; }
+      .deck-mini-card-name { font-size: 6px; }
+      .deck-preview { gap: 4px; }
+      .battle-table .date-td { font-size: 11px; }
 
       .sheet { padding: 12px; }
       .carousel-panel { padding: 14px; gap: 10px; }
@@ -1108,7 +1151,7 @@
                 <th>Round</th>
                 <th>Deck</th>
                 <th>Outcome</th>
-                <th>Prize</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody id="battleTableBody"></tbody>
@@ -1745,16 +1788,20 @@
       tbody.innerHTML = rows.map((row, i) => {
         const outcomeClass = row.won ? 'win' : 'loss';
         const outcomeText = row.won ? 'WIN' : 'LOSS';
-        const isFlies = row.roundNumber === 1;
-        const prizeHtml = isFlies
-          ? `<span class="prize-flies"><img src="/gib-assets/fly.svg" class="prize-fly-icon" alt="" /> 10</span>`
-          : `<span class="prize-cash">${escHtml(row.prize.replace(' USD', ''))}</span>`;
+
+        const deckHtml = row.battle.my.cards.map(c => {
+          const imgSrc = `/assets/card-images/${c.meme}.png`;
+          return `<div class="deck-mini-card">
+            <div class="deck-mini-card-img" style="background-image:url('${imgSrc}')"></div>
+            <div class="deck-mini-card-name">${escHtml(c.meme)}</div>
+          </div>`;
+        }).join('');
 
         return `<tr onclick="openBattleSheet(${i})">
           <td class="round-td">${row.roundNumber}</td>
-          <td class="deck-td">Deck ${row.deckNumber}</td>
+          <td class="deck-td"><div class="deck-preview">${deckHtml}</div></td>
           <td><span class="outcome-pill ${outcomeClass}">${outcomeText}</span></td>
-          <td>${prizeHtml}</td>
+          <td class="date-td">${escHtml(row.date || '')}</td>
         </tr>`;
       }).join('');
     }
