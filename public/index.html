@@ -418,7 +418,8 @@
 
     .battle-table .round-td { font-size: 15px; font-weight: 700; }
     .battle-table .deck-td { padding-top: 10px; padding-bottom: 10px; }
-    .battle-table .date-td { color: #888; font-weight: 600; font-size: 13px; }
+    .battle-table .date-td { color: #888; font-weight: 600; font-size: 13px; line-height: 1.4; }
+    .battle-table .date-time { font-weight: 300; }
 
     .deck-preview {
       display: flex;
@@ -1820,7 +1821,11 @@
           <td class="round-td">${row.roundNumber}</td>
           <td class="deck-td"><div class="deck-preview">${deckHtml}</div></td>
           <td><span class="outcome-pill ${outcomeClass}">${outcomeText}</span></td>
-          <td class="date-td">${escHtml(row.date || '')}</td>
+          <td class="date-td">${(() => {
+            const d = row.date || '';
+            const m = d.match(/^(.+\d{4})\s+(.+)$/);
+            return m ? escHtml(m[1]) + ' <span class="date-time">' + escHtml(m[2]) + '</span>' : escHtml(d);
+          })()}</td>
         </tr>`;
       }).join('');
     }
