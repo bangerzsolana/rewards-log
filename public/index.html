@@ -81,18 +81,13 @@
       gap: 20px;
     }
     .profile-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      border-radius: var(--half-radius);
       border: var(--border-width) solid var(--black-border);
       flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'LuckiestGuy', sans-serif;
-      font-size: 32px;
-      color: #fff;
-      padding-top: 4px;
+      object-fit: cover;
+      display: block;
     }
     .profile-info {
       display: flex;
@@ -101,6 +96,12 @@
       min-width: 0;
       flex: 1;
     }
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
     .profile-username {
       font-family: 'LuckiestGuy', sans-serif;
       font-size: 36px;
@@ -108,6 +109,26 @@
       line-height: 1;
       letter-spacing: 0.02em;
     }
+    .profile-social {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: var(--border-width) solid var(--black-border);
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--black-border);
+      flex-shrink: 0;
+      box-shadow: 3px 2px 0 var(--black-border);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .profile-social:active {
+      transform: translate(2px, 1.5px);
+      box-shadow: none;
+    }
+    .profile-social svg { width: 14px; height: 14px; display: block; }
     .profile-badges {
       display: flex;
       gap: 8px;
@@ -138,8 +159,10 @@
 
     @media (max-width: 700px) {
       .profile-header { padding: 14px 16px; gap: 14px; }
-      .profile-avatar { width: 56px; height: 56px; font-size: 24px; }
+      .profile-avatar { width: 60px; height: 60px; }
       .profile-username { font-size: 24px; }
+      .profile-social { width: 26px; height: 26px; }
+      .profile-social svg { width: 12px; height: 12px; }
       .profile-badge { font-size: 11px; padding: 4px 10px; }
     }
 
@@ -1185,9 +1208,14 @@
     <div class="status-bar" id="statusBar"></div>
 
     <div class="profile-header">
-      <div class="profile-avatar" style="background:#b29bf4">W</div>
+      <img class="profile-avatar" src="/assets/profile/frog.png" alt="WiderBlusters" />
       <div class="profile-info">
-        <div class="profile-username">@WiderBlusters</div>
+        <div class="profile-name-row">
+          <div class="profile-username">@WiderBlusters</div>
+          <a class="profile-social" href="https://x.com/WiderBlusters" target="_blank" rel="noopener" aria-label="X profile">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
         <div class="profile-badges">
           <div class="profile-badge badge-streak"><span class="profile-badge-icon">🔥</span><span>10 Streak</span></div>
           <div class="profile-badge badge-flies"><span class="profile-badge-icon">🪰</span><span>2,110 Flies</span></div>
