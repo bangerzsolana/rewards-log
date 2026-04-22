@@ -75,22 +75,20 @@
       background: #ffffff;
       border: var(--border-width) solid var(--black-border);
       border-radius: var(--radius);
-      padding: 0 28px 24px 0;
+      padding: 24px 28px;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       gap: 24px;
-      overflow: hidden;
-      min-height: 160px;
     }
     .profile-avatar {
-      width: 160px;
-      height: 160px;
-      border-radius: 0 0 0 0;
+      width: 140px;
+      height: 140px;
+      border-radius: var(--half-radius);
+      border: var(--border-width) solid var(--black-border);
       flex-shrink: 0;
       object-fit: cover;
       display: block;
       background: #D0F8D2;
-      align-self: stretch;
     }
     .profile-info {
       display: flex;
@@ -98,7 +96,6 @@
       gap: 10px;
       min-width: 0;
       flex: 1;
-      padding-top: 24px;
     }
     .profile-name-row {
       display: flex;
