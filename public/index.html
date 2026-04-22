@@ -75,20 +75,22 @@
       background: #ffffff;
       border: var(--border-width) solid var(--black-border);
       border-radius: var(--radius);
-      padding: 28px 28px;
+      padding: 0 28px 24px 0;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: 24px;
+      overflow: hidden;
+      min-height: 160px;
     }
     .profile-avatar {
-      width: 110px;
-      height: 110px;
-      border-radius: var(--half-radius);
-      border: var(--border-width) solid var(--black-border);
+      width: 160px;
+      height: 160px;
+      border-radius: 0 0 0 0;
       flex-shrink: 0;
       object-fit: cover;
       display: block;
       background: #D0F8D2;
+      align-self: stretch;
     }
     .profile-info {
       display: flex;
@@ -96,6 +98,7 @@
       gap: 10px;
       min-width: 0;
       flex: 1;
+      padding-top: 24px;
     }
     .profile-name-row {
       display: flex;
@@ -159,9 +162,10 @@
     }
 
     @media (max-width: 700px) {
-      .profile-header { padding: 18px 16px; gap: 16px; }
-      .profile-avatar { width: 80px; height: 80px; }
-      .profile-username { font-size: 24px; }
+      .profile-header { padding: 0 16px 16px 0; gap: 14px; min-height: 120px; }
+      .profile-avatar { width: 120px; height: 120px; }
+      .profile-info { padding-top: 16px; }
+      .profile-username { font-size: 22px; }
       .profile-social { width: 26px; height: 26px; }
       .profile-social svg { width: 12px; height: 12px; }
       .profile-badge { font-size: 11px; padding: 4px 10px; }
@@ -1209,7 +1213,7 @@
     <div class="status-bar" id="statusBar"></div>
 
     <div class="profile-header">
-      <img class="profile-avatar" src="/assets/profile/frog.svg" alt="WiderBlusters" />
+      <img class="profile-avatar" src="/assets/profile/frog.png" alt="WiderBlusters" />
       <div class="profile-info">
         <div class="profile-name-row">
           <div class="profile-username">@WiderBlusters</div>
